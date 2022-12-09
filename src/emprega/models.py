@@ -220,8 +220,8 @@ class Vaga(TimeStampedModel):
     regime_contratual = models.PositiveSmallIntegerField(verbose_name='Regime contratual',
                                                          choices=RegimeContratualChoices.choices)
     sexo = models.PositiveSmallIntegerField(verbose_name='Sexo', null=True, blank=True, choices=SexoChoices.choices)
-    idade_minima = models.IntegerField(verbose_name='Idade mínima', null=True, blank=True)
-    idade_maxima = models.IntegerField(verbose_name='Idade máxima', null=True, blank=True)
+    idade_minima = models.PositiveIntegerField(verbose_name='Idade mínima', null=True, blank=True)
+    idade_maxima = models.PositiveIntegerField(verbose_name='Idade máxima', null=True, blank=True)
     quantidade_vagas = models.IntegerField(verbose_name='Quantidade de vagas', null=True, blank=True)
     habilitado = models.BooleanField(verbose_name='Habilitado', default=True)
     beneficios = models.TextField(verbose_name='Benefícios', null=True, blank=True)
