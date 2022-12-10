@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from emprega.models import User, Empresa, Vaga, ObjetivoProfissional, FormacaoAcademica, ExperienciaProfissional, \
-    Idioma, CursoEspecializacao
+    Idioma, CursoEspecializacao, Candidatura, Endereco
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -9,7 +9,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fiels = '__all__'
+        fields = '__all__'
 
 
 class EmpresaSerializer(serializers.ModelSerializer):
@@ -42,7 +42,7 @@ class ExperienciaProfissionalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IdiomassSerializer(serializers.ModelSerializer):
+class IdiomaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idioma
         fields = '__all__'
@@ -51,4 +51,16 @@ class IdiomassSerializer(serializers.ModelSerializer):
 class CursoEspecializacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoEspecializacao
+        fields = '__all__'
+
+
+class EnderecoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endereco
+        fields = '__all__'
+
+
+class CandidaturaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Candidatura
         fields = '__all__'
