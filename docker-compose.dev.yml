@@ -1,0 +1,19 @@
+services:
+  db:
+    restart: unless-stopped
+    volumes:
+      - ./emprega_base:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.dev
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+  web:
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./src:/app
+    env_file:
+      - .env.dev

@@ -1,0 +1,59 @@
+services:
+  db:
+    container_name: emprega_db
+    image: postgres:13-alpine
+    volumes:
+      - emprega_base:/var/lib/postgresql/data
+    env_file:
+      - .env
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER} -d ${DB_NAME}"
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+
+  migrate:
+    container_name: emprega_migrate
+    build: .
+    command: python manage.py migrate --noinput
+    env_file:
+      - .env
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python manage.py migrate --check --dry-run"
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    container_name: emprega_web
+    build: .
+    restart: unless-stopped
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  emprega_base:
+    external: true
