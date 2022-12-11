@@ -4,6 +4,15 @@ Para desenvolvimento
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up db
+```
+
+```bash
+docker exec -ti emprega_web sh
+```
+
+
 Reset do banco de dados
 ```bash
 docker volume rm emprega_base
