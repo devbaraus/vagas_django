@@ -1,6 +1,9 @@
-from django.contrib.auth.base_user import AbstractBaseUser
+from auditlog.registry import auditlog
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+
+from emprega.validators import validate_cpf, validate_cnpj
 
 
 class UsuarioNivelChoices(models.IntegerChoices):
@@ -50,7 +53,7 @@ class JornadaTrabalhoChoices(models.IntegerChoices):
     TEMPO_FLEXIVEL = 3, 'Tempo Flexível'
 
 
-class TimeStampedModel(models.Model):
+class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -83,11 +86,64 @@ class RegimeContratualChoices(models.IntegerChoices):
     OUTRO = 7, 'Outro'
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
-    nivel_usuario = models.PositiveSmallIntegerField(verbose_name='Nível de Usuário', default=None,
+class UserManager(BaseUserManager):
+    def create_user(self, cpf, nome, email, data_nascimento, password):
+        if not email:
+            raise ValueError('Usuários devem ter um email')
+
+        if not password:
+            raise ValueError('Usuários devem ter uma senha')
+
+        if not cpf:
+            raise ValueError('Usuários devem ter um CPF')
+
+        if not data_nascimento:
+            raise ValueError('Usuários devem ter uma data de nascimento')
+
+        if not nome:
+            raise ValueError('Usuários devem ter um nome')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            cpf=cpf,
+            data_nascimento=data_nascimento,
+            nome=nome,
+        )
+
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, cpf, nome, email, data_nascimento, password):
+        user = self.create_user(
+            cpf,
+            nome,
+            email,
+            data_nascimento,
+            password,
+        )
+        user.is_superuser = True
+        user.nivel_usuario = UsuarioNivelChoices.SUPERADMIN
+        user.save()
+        return user
+
+
+class CandidatoManager(models.Manager):
+    def get_queryset(self):
+        return super(CandidatoManager, self).get_queryset().filter(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
+
+
+class EmpregadorManager(models.Manager):
+    def get_queryset(self):
+        return super(EmpregadorManager, self).get_queryset().filter(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
+
+
+class User(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
+    nivel_usuario = models.PositiveSmallIntegerField(verbose_name='Nível de Usuário',
+                                                     default=UsuarioNivelChoices.CANDIDATO,
                                                      choices=UsuarioNivelChoices.choices)
     nome = models.CharField(verbose_name='Nome completo', max_length=255)
-    cpf = models.CharField(verbose_name='CPF', max_length=11, unique=True)
+    cpf = models.CharField(verbose_name='CPF', max_length=11, unique=True, validators=[validate_cpf])
     data_nascimento = models.DateField(verbose_name='Data de nascimento')
     sexo = models.PositiveSmallIntegerField(verbose_name='Sexo', null=True, blank=True, choices=SexoChoices.choices)
     estado_civil = models.PositiveSmallIntegerField(verbose_name='Estado civil', null=True, blank=True,
@@ -106,14 +162,38 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
     habilitado = models.BooleanField(verbose_name='habilitado', default=True)
 
+    @property
+    def is_staff(self):
+        return self.nivel_usuario <= UsuarioNivelChoices.ADMIN
+
     USERNAME_FIELD = 'cpf'
     REQUIRED_FIELDS = ['nome', 'email', 'data_nascimento']
+
+    objects = UserManager()
 
     def __str__(self):
         return self.nome
 
 
-class ObjetivoProfissional(TimeStampedModel):
+class Candidato(User):
+    objects = CandidatoManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Candidato'
+        verbose_name_plural = 'Candidatos'
+
+
+class Empregador(User):
+    objects = EmpregadorManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = 'Empregador'
+        verbose_name_plural = 'Empregadores'
+
+
+class ObjetivoProfissional(AbstractBaseModel):
     cargo = models.CharField(verbose_name='Cargo', max_length=255)
     salario = models.DecimalField(verbose_name='Pretensão salarial', max_digits=10, decimal_places=2)
     modelo_trabalho = models.PositiveSmallIntegerField(verbose_name='Modelo de trabalho',
@@ -128,7 +208,7 @@ class ObjetivoProfissional(TimeStampedModel):
         return self.usuario.nome
 
 
-class Idioma(TimeStampedModel):
+class Idioma(AbstractBaseModel):
     nome = models.CharField(verbose_name='Nome', max_length=255)
     nivel = models.PositiveSmallIntegerField(verbose_name='Nível', choices=IdiomaNivelChoices.choices)
 
@@ -138,7 +218,7 @@ class Idioma(TimeStampedModel):
         return self.nome
 
 
-class FormacaoAcademica(TimeStampedModel):
+class FormacaoAcademica(AbstractBaseModel):
     instituicao = models.CharField(verbose_name='Instituição', max_length=255)
     curso = models.CharField(verbose_name='Curso', max_length=255)
     nivel = models.PositiveSmallIntegerField(verbose_name='Nível', choices=FormacaoNivelChoices.choices)
@@ -151,7 +231,7 @@ class FormacaoAcademica(TimeStampedModel):
         return self.instituicao + ' - ' + self.curso
 
 
-class ExperienciaProfissional(TimeStampedModel):
+class ExperienciaProfissional(AbstractBaseModel):
     empresa = models.CharField(verbose_name='Empresa', max_length=255)
     cargo = models.CharField(verbose_name='Cargo', max_length=255)
     salario = models.DecimalField(verbose_name='Salário', max_digits=10, decimal_places=2)
@@ -165,7 +245,7 @@ class ExperienciaProfissional(TimeStampedModel):
         return self.empresa + ' - ' + self.cargo
 
 
-class CursoEspecializacao(TimeStampedModel):
+class CursoEspecializacao(AbstractBaseModel):
     instituicao = models.CharField(verbose_name='Instituição', max_length=255)
     curso = models.CharField(verbose_name='Curso', max_length=255)
     data_conclusao = models.DateField(verbose_name='Data de conclusão')
@@ -178,7 +258,7 @@ class CursoEspecializacao(TimeStampedModel):
         return self.instituicao + ' - ' + self.curso
 
 
-class Endereco(TimeStampedModel):
+class Endereco(AbstractBaseModel):
     cep = models.CharField(verbose_name='CEP', max_length=8, null=True, blank=True)
     logradouro = models.CharField(verbose_name='Endereço', max_length=255, null=True, blank=True)
     numero = models.CharField(verbose_name='Número', max_length=255, null=True, blank=True)
@@ -188,11 +268,11 @@ class Endereco(TimeStampedModel):
     estado = models.CharField(verbose_name='Estado', max_length=2, null=True, blank=True)
 
 
-class Empresa(TimeStampedModel):
-    cnpj = models.CharField(verbose_name='CNPJ', max_length=14, unique=True)
+class Empresa(AbstractBaseModel):
+    cnpj = models.CharField(verbose_name='CNPJ', max_length=14, unique=True, validators=[validate_cnpj])
     razao_social = models.CharField(verbose_name='Razão Social', max_length=255)
     nome_fantasia = models.CharField(verbose_name='Nome Fantasia', max_length=255)
-    ramo_atividade = models.CharField(verbose_name='Ramo de atividade', max_length=255)
+    ramo_atividade = models.TextField(verbose_name='Ramo de atividade', max_length=255)
     numero_funcionarios = models.IntegerField(verbose_name='Número de funcionários', null=True, blank=True)
     telefone = models.CharField(verbose_name='Telefone', max_length=14, null=True, blank=True)
     email = models.EmailField(verbose_name='E-mail', unique=True)
@@ -208,7 +288,7 @@ class Empresa(TimeStampedModel):
         return self.nome_fantasia
 
 
-class Vaga(TimeStampedModel):
+class Vaga(AbstractBaseModel):
     cargo = models.CharField(verbose_name='Cargo', max_length=255)
     atividades = models.TextField(verbose_name='Atividades')
     requisitos = models.TextField(verbose_name='Requisitos')
@@ -232,9 +312,23 @@ class Vaga(TimeStampedModel):
         return self.cargo
 
 
-class Candidatura(TimeStampedModel):
+class Candidatura(AbstractBaseModel):
     vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, related_name='vaga_candidatura')
     candidato = models.ForeignKey(User, on_delete=models.CASCADE, related_name='candidato_candidatura')
 
     def __str__(self):
         return self.vaga.cargo
+
+
+auditlog.register(User)
+auditlog.register(Candidato)
+auditlog.register(Empregador)
+auditlog.register(Endereco)
+auditlog.register(Empresa)
+auditlog.register(Vaga)
+auditlog.register(Candidatura)
+auditlog.register(FormacaoAcademica)
+auditlog.register(ObjetivoProfissional)
+auditlog.register(Idioma)
+auditlog.register(ExperienciaProfissional)
+auditlog.register(CursoEspecializacao)
