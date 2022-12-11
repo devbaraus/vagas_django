@@ -19,6 +19,6 @@ urlpatterns = [
     path(r'logoutall/', knox_views.LogoutAllView.as_view(), name='knox_logoutall'),
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('docs/', include_docs_urls(title='Emprega Anápolis API', public=os.getenv('DEBUG', False))),
+    path('docs/', include_docs_urls(title='Emprega Anápolis API', public=os.getenv('DJANGO_DEBUG', False))),
     # path('api-auth/', include('rest_framework.urls'))
 ]

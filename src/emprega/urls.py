@@ -1,13 +1,16 @@
 from rest_framework.routers import DefaultRouter
 
-from emprega.views import UsuarioViews, EmpresaViews, CandidaturaViews, ObjetivoProfissionalViews, IdiomaViews, \
-    CursoEspecializacaoViews, FormacaoAcademicaViews, ExperienciaProfissionalViews, EnderecoViews, VagaViews
+from emprega.views import EmpresaViews, CandidaturaViews, ObjetivoProfissionalViews, IdiomaViews, \
+    CursoEspecializacaoViews, FormacaoAcademicaViews, ExperienciaProfissionalViews, EnderecoViews, VagaViews, \
+    EmpregadorViews, CandidatoViews, UserViews
 
 app_name = 'emprega_api'
 
 router = DefaultRouter()
 
-router.register('usuario', UsuarioViews, basename='usuario')
+router.register('user', UserViews, basename='user')
+router.register('candidato', CandidatoViews, basename='candidato')
+router.register('empregador', EmpregadorViews, basename='empregador')
 router.register('empresa', EmpresaViews, basename='empresa')
 router.register('candidatura', CandidaturaViews, basename='candidatura')
 router.register('objetivo_profissional', ObjetivoProfissionalViews, basename='objetivo_profissional')
