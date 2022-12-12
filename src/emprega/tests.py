@@ -611,7 +611,7 @@ class AdminCandidatoTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.ADMIN)
         self.client = APIClient()
-        self.uri = '/empresa/'
+        self.uri = '/candidato/'
         self.create_status = None
         self.update_status = None
         self.retrieve_status = None
