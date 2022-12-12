@@ -272,7 +272,7 @@ class Empresa(AbstractBaseModel):
     cnpj = models.CharField(verbose_name='CNPJ', max_length=14, unique=True, validators=[validate_cnpj])
     razao_social = models.CharField(verbose_name='Razão Social', max_length=255)
     nome_fantasia = models.CharField(verbose_name='Nome Fantasia', max_length=255)
-    ramo_atividade = models.TextField(verbose_name='Ramo de atividade', max_length=255)
+    ramo_atividade = models.CharField(verbose_name='Ramo de atividade', max_length=255)
     numero_funcionarios = models.IntegerField(verbose_name='Número de funcionários', null=True, blank=True)
     telefone = models.CharField(verbose_name='Telefone', max_length=14, null=True, blank=True)
     email = models.EmailField(verbose_name='E-mail', unique=True)

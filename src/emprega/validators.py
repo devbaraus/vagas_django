@@ -91,7 +91,7 @@ def validate_cnpj(cnpj: str) -> str:
     if len(set(numbers)) == 1:
         raise ValidationError('CPNJ não pode possuir todos os digitos iguais.')
 
-    cnpj_r = cnpj[::-1]
+    cnpj_r = numbers[::-1]
     for i in range(2, 0, -1):
         cnpj_enum = zip(cycle(range(2, 10)), cnpj_r[i:])
         dv = sum(map(lambda x: int(x[1]) * x[0], cnpj_enum)) * 10 % 11

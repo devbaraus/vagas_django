@@ -6,7 +6,7 @@ from emprega.models import UsuarioNivelChoices, Empresa, Vaga, Endereco
 
 class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if not bool(request.user):
+        if not bool(request.user) or request.user.is_anonymous:
             return False
 
         if request.user.nivel_usuario <= UsuarioNivelChoices.ADMIN:

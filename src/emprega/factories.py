@@ -1,8 +1,9 @@
 import factory
 from django.contrib.auth.hashers import make_password
 from factory.django import DjangoModelFactory
+from factory import fuzzy, faker
 
-from emprega.models import User
+from emprega.models import User, Empresa, Endereco, SexoChoices, EstadoCivilChoices, TipoDeficienciaChoices
 
 import random
 
@@ -32,10 +33,20 @@ class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
 
-    cpf = factory.lazy_attribute(lambda n: generate_cpf())
-    email = factory.Faker('email')
     nome = factory.Faker('name')
+    cpf = factory.lazy_attribute(lambda n: generate_cpf())
     data_nascimento = factory.Faker('date_of_birth', minimum_age=18, maximum_age=65)
+    sexo = factory.lazy_attribute(lambda _: random.choice(SexoChoices.choices)[0])
+    estado_civil = factory.lazy_attribute(lambda _: random.choice(EstadoCivilChoices.choices)[0])
+
+    tipo_deficiencia = factory.lazy_attribute(lambda _: random.choice(TipoDeficienciaChoices.choices)[0])
+
+    area_atuacao = factory.Faker('job')
+    cargo = factory.Faker('job')
+
+    email = factory.Faker('email')
+    telefone = fuzzy.FuzzyText(length=14, chars='0123456789')
+
     password = factory.Sequence(lambda p: 'mysuperpass%s' % p)
 
     @classmethod
@@ -43,3 +54,33 @@ class UserFactory(DjangoModelFactory):
         """Override the default ``_create`` with our custom call."""
         kwargs['password'] = make_password(kwargs['password'])
         return super(UserFactory, cls)._create(model_class, *args, **kwargs)
+
+
+class EmpresaFactory(DjangoModelFactory):
+    class Meta:
+        model = Empresa
+
+    cnpj = factory.lazy_attribute(lambda n: generate_cnpj())
+    nome_fantasia = factory.Faker('name')
+    razao_social = factory.Faker('name')
+    ramo_atividade = factory.Faker('name')
+    numero_funcionarios = factory.Faker('random_int', min=1, max=1000)
+    telefone = fuzzy.FuzzyText(length=14, chars='0123456789')
+    email = factory.Faker('email')
+    site = factory.lazy_attribute(lambda n: f'https://www.{fuzzy.FuzzyText().fuzz()}.com.br')
+    descricao = factory.Faker('text')
+
+
+class EnderecoFactory(DjangoModelFactory):
+    class Meta:
+        model = Endereco
+
+    cep = factory.lazy_attribute(
+        lambda
+            n: f'{fuzzy.FuzzyText(length=8, chars="0123456789").fuzz()}')
+    logradouro = factory.Faker('street_name')
+    numero = factory.Faker('building_number')
+    complemento = factory.Faker('secondary_address')
+    bairro = factory.Faker('street_name')
+    cidade = factory.Faker('city')
+    estado = factory.Faker('state_abbr')
