@@ -4,6 +4,31 @@ from rest_framework.permissions import SAFE_METHODS
 from emprega.models import UsuarioNivelChoices, Empresa, Vaga, Endereco
 
 
+class OwnedByPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if bool(request.user) and not request.user.is_anonymous:
+            return True
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if obj == request.user:
+            return True
+
+        if hasattr(obj, "usuario") and obj.usuario == request.user:
+            return True
+
+        if isinstance(obj, Vaga) and obj.empresa.usuario == request.user:
+            return True
+
+        if (
+            isinstance(obj, Endereco)
+            and request.user.usuario_empresa.empresa.endereco == obj
+        ):
+            return True
+
+        return False
+
+
 class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if not bool(request.user) or request.user.is_anonymous:
@@ -27,9 +52,49 @@ class AdminPermission(permissions.BasePermission):
         return False
 
 
+class IsEmpregadorPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not bool(request.user) or request.user.is_anonymous:
+            return False
+
+        if request.user.nivel_usuario == UsuarioNivelChoices.EMPREGADOR:
+            return True
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if not bool(request.user) or request.user.is_anonymous:
+            return False
+
+        if request.user.nivel_usuario == UsuarioNivelChoices.EMPREGADOR:
+            return True
+
+        return False
+
+
+class IsCandidatoPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not bool(request.user) or request.user.is_anonymous:
+            return False
+
+        if request.user.nivel_usuario == UsuarioNivelChoices.CANDIDATO:
+            return True
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if not bool(request.user) or request.user.is_anonymous:
+            return False
+
+        if request.user.nivel_usuario == UsuarioNivelChoices.CANDIDATO:
+            return True
+
+        return False
+
+
 class CreatePermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'POST':
+        if request.method == "POST":
             return True
         return False
 
@@ -39,21 +104,15 @@ class CreatePermission(permissions.BasePermission):
 
 class UpdatePermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'PUT':
+        if request.method == "PUT":
             return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
         return False
 
 
 class DeletePermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == 'DELETE':
+        if request.method == "DELETE":
             return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
         return False
 
 
@@ -61,24 +120,4 @@ class ReadOnlyPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
-        return False
-
-
-class OwnedByPermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if obj == request.user:
-            return True
-
-        if hasattr(obj, 'usuario') and obj.usuario == request.user:
-            return True
-
-        if isinstance(obj, Vaga) and obj.empresa.usuario == request.user:
-            return True
-
-        if isinstance(obj, Endereco) and request.user.usuario_empresa.empresa.endereco == obj:
-            return True
-
         return False

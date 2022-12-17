@@ -1,9 +1,21 @@
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 
-from emprega.models import Empresa, Vaga, ObjetivoProfissional, FormacaoAcademica, ExperienciaProfissional, \
-    Idioma, CursoEspecializacao, Candidatura, Endereco, Empregador, Candidato, User
-from emprega.validators import validate_cnpj
+from emprega.models import (
+    Empresa,
+    Vaga,
+    ObjetivoProfissional,
+    FormacaoAcademica,
+    ExperienciaProfissional,
+    Idioma,
+    CursoEspecializacao,
+    Candidatura,
+    Endereco,
+    Empregador,
+    Candidato,
+    User,
+    ModeloTrabalhoChoices,
+    RegimeContratualChoices,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,25 +23,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
-        extra_kwargs = {
-            'password': {
-                'write_only': True
-            }
-        }
+        fields = "__all__"
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class EmpregadorSerializer(UserSerializer):
     class Meta:
         model = Empregador
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {
-            'password': {
-                'write_only': True
-            },
-            'is_superuser': {
-                'read_only': True
-            }
+            "password": {"write_only": True},
+            "is_superuser": {"read_only": True},
         }
 
 
@@ -56,111 +60,114 @@ class EmpregadorCreateSerializer(UserSerializer):
 
     class Meta:
         model = Empregador
-        fields = '__all__'
+        fields = "__all__"
         extra_kwargs = {
-            'last_login': {
-                'read_only': True
-            },
-            'is_superuser': {
-                'read_only': True
-            },
-            'nivel_usuario': {
-                'read_only': True
-            },
-            'groups': {
-                'read_only': True
-            },
-            'user_permissions': {
-                'read_only': True
-            },
-            'habilitado': {
-                'read_only': True
-            },
-            'foto': {
-                'read_only': True
-            }
+            "last_login": {"read_only": True},
+            "is_superuser": {"read_only": True},
+            "nivel_usuario": {"read_only": True},
+            "groups": {"read_only": True},
+            "user_permissions": {"read_only": True},
+            "habilitado": {"read_only": True},
+            "foto": {"read_only": True},
+            "tipo_deficiencia": {"read_only": True},
         }
 
 
 class EmpregadorListSerializer(UserSerializer):
     class Meta:
         model = Empregador
-        fields = ['id', 'nome']
+        fields = ["id", "nome"]
 
 
 class CandidatoSerializer(UserSerializer):
     class Meta:
         model = Candidato
-        fields = '__all__'
-        extra_kwargs = {
-            'password': {
-                'write_only': True
-            }
-        }
+        fields = "__all__"
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class CandidatoListSerializer(UserSerializer):
     class Meta:
         model = Candidato
-        fields = ['id', 'nome']
+        fields = ["id", "nome"]
+
+
+class CandidatoCreateSerializer(UserSerializer):
+    # OBJETIVO PROFISSIONAL
+    cargo = serializers.CharField(max_length=255, required=False)
+    salario = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    modelo_trabalho = serializers.ChoiceField(
+        choices=ModeloTrabalhoChoices.choices, required=False
+    )
+    regime_contratual = serializers.ChoiceField(
+        choices=RegimeContratualChoices.choices, required=False
+    )
+    jornada_trabalho = serializers.CharField(max_length=255, required=False)
+
+    class Meta:
+        model = Candidato
+        fields = "__all__"
+        extra_kwargs = {
+            "last_login": {"read_only": True},
+            "is_superuser": {"read_only": True},
+            "nivel_usuario": {"read_only": True},
+            "groups": {"read_only": True},
+            "user_permissions": {"read_only": True},
+            "habilitado": {"read_only": True},
+            "foto": {"read_only": True},
+            "area_atuacao": {"read_only": True},
+        }
 
 
 class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
-        fields = '__all__'
-
-    def create(self, validated_data):
-        empregador = Empregador.objects.get(pk=validated_data['usuario'])
-        empresa = Empresa.objects.create(**validated_data)
-        empregador.empresa = empresa
-        empregador.save()
-        return empresa
+        fields = "__all__"
 
 
 class VagaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vaga
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ObjetivoProfissionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjetivoProfissional
-        fields = '__all__'
+        fields = "__all__"
 
 
 class FormacaoAcademicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormacaoAcademica
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ExperienciaProfissionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaProfissional
-        fields = '__all__'
+        fields = "__all__"
 
 
 class IdiomaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Idioma
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CursoEspecializacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoEspecializacao
-        fields = '__all__'
+        fields = "__all__"
 
 
 class EnderecoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Endereco
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CandidaturaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Candidatura
-        fields = '__all__'
+        fields = "__all__"
