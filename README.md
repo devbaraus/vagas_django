@@ -17,7 +17,7 @@ Reset do banco de dados
 ```bash
 docker volume rm emprega_base
 docker volume create emprega_base
-docker rm -rf emprega_base
+sudo rm -rf emprega_base
 ```
 
 Para produção

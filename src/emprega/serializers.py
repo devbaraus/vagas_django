@@ -39,24 +39,24 @@ class EmpregadorSerializer(UserSerializer):
 
 class EmpregadorCreateSerializer(UserSerializer):
     # EMPRESA
-    cnpj = serializers.CharField(max_length=14, min_length=14, required=True)
-    nome_fantasia = serializers.CharField(max_length=255, required=True)
-    razao_social = serializers.CharField(max_length=255, required=True)
-    ramo_atividade = serializers.CharField(max_length=255, required=True)
-    numero_funcionarios = serializers.IntegerField(required=False)
-    empresa_telefone = serializers.CharField(max_length=14, required=False)
-    empresa_email = serializers.EmailField(required=True)
-    site = serializers.URLField(required=False)
-    descricao = serializers.CharField(required=False)
+    cnpj = serializers.CharField(max_length=14, min_length=14, required=True, write_only=True)
+    nome_fantasia = serializers.CharField(max_length=255, required=True, write_only=True)
+    razao_social = serializers.CharField(max_length=255, required=True, write_only=True)
+    ramo_atividade = serializers.CharField(max_length=255, required=True, write_only=True)
+    numero_funcionarios = serializers.IntegerField(required=False, write_only=True)
+    empresa_telefone = serializers.CharField(max_length=14, required=False, write_only=True)
+    empresa_email = serializers.EmailField(required=True, write_only=True)
+    site = serializers.URLField(required=False, write_only=True)
+    descricao = serializers.CharField(required=False, write_only=True)
 
     # ENDERECO
-    cep = serializers.CharField(max_length=8, min_length=8, required=False)
-    logradouro = serializers.CharField(max_length=255, required=False)
-    numero = serializers.CharField(max_length=255, required=False)
-    complemento = serializers.CharField(max_length=255, required=False)
-    bairro = serializers.CharField(max_length=255, required=False)
-    cidade = serializers.CharField(max_length=255, required=False)
-    estado = serializers.CharField(max_length=2, min_length=2, required=False)
+    cep = serializers.CharField(max_length=8, min_length=8, required=False, write_only=True)
+    logradouro = serializers.CharField(max_length=255, required=False, write_only=True)
+    numero = serializers.CharField(max_length=255, required=False, write_only=True)
+    complemento = serializers.CharField(max_length=255, required=False, write_only=True)
+    bairro = serializers.CharField(max_length=255, required=False, write_only=True)
+    cidade = serializers.CharField(max_length=255, required=False, write_only=True)
+    estado = serializers.CharField(max_length=2, min_length=2, required=False, write_only=True)
 
     class Meta:
         model = Empregador
@@ -116,6 +116,11 @@ class CandidatoCreateSerializer(UserSerializer):
             "habilitado": {"read_only": True},
             "foto": {"read_only": True},
             "area_atuacao": {"read_only": True},
+            "cargo": {"write_only": True},
+            "salario": {"write_only": True},
+            "modelo_trabalho": {"write_only": True},
+            "regime_contratual": {"write_only": True},
+            "jornada_trabalho": {"write_only": True},
         }
 
 
@@ -123,6 +128,33 @@ class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
         fields = "__all__"
+
+
+class EnderecoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endereco
+        fields = "__all__"
+
+
+class EmpresaCreateSerializer(serializers.ModelSerializer):
+    cep = serializers.CharField(
+        max_length=8, min_length=8, required=False, write_only=True
+    )
+    logradouro = serializers.CharField(max_length=255, required=False, write_only=True)
+    numero = serializers.CharField(max_length=255, required=False, write_only=True)
+    complemento = serializers.CharField(max_length=255, required=False, write_only=True)
+    bairro = serializers.CharField(max_length=255, required=False, write_only=True)
+    cidade = serializers.CharField(max_length=255, required=False, write_only=True)
+    estado = serializers.CharField(
+        max_length=2, min_length=2, required=False, write_only=True
+    )
+
+    class Meta:
+        model = Empresa
+        fields = "__all__"
+        extra_kwargs = {
+            "endereco": {"read_only": True},
+        }
 
 
 class VagaSerializer(serializers.ModelSerializer):
@@ -158,12 +190,6 @@ class IdiomaSerializer(serializers.ModelSerializer):
 class CursoEspecializacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoEspecializacao
-        fields = "__all__"
-
-
-class EnderecoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Endereco
         fields = "__all__"
 
 

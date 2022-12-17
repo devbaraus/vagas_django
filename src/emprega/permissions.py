@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework.permissions import SAFE_METHODS
 
-from emprega.models import UsuarioNivelChoices, Empresa, Vaga, Endereco
+from emprega.models import UsuarioNivelChoices, Empresa, Vaga, Endereco, Candidatura
 
 
 class OwnedByPermission(permissions.BasePermission):
@@ -112,6 +112,13 @@ class UpdatePermission(permissions.BasePermission):
 class DeletePermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == "DELETE":
+            return True
+        return False
+
+
+class DetailPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == "GET" and request.action == "retrieve":
             return True
         return False
 

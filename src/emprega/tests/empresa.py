@@ -7,7 +7,7 @@ from emprega.factories import (
     VagaFactory,
     EnderecoFactory,
 )
-from emprega.models import UsuarioNivelChoices, Vaga
+from emprega.models import UsuarioNivelChoices, Vaga, Empregador
 
 
 class AdminEmpresaTestCase(APITestCase):
@@ -27,7 +27,7 @@ class AdminEmpresaTestCase(APITestCase):
         if not self.user:
             self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
 
-        endereco = EnderecoFactory()
+        endereco = EnderecoFactory.stub()
         item = EmpresaFactory.stub(usuario=self.user)
 
         data = {
@@ -40,8 +40,14 @@ class AdminEmpresaTestCase(APITestCase):
             "telefone": item.telefone,
             "email": item.email,
             "site": item.site,
-            "endereco": endereco.id,
             "usuario": item.usuario.id,
+            "cep": endereco.cep,
+            "logradouro": endereco.logradouro,
+            "numero": endereco.numero,
+            "complemento": endereco.complemento,
+            "bairro": endereco.bairro,
+            "cidade": endereco.cidade,
+            "estado": endereco.estado,
         }
 
         response = self.client.post(self.uri, data=data)
@@ -64,8 +70,12 @@ class AdminEmpresaTestCase(APITestCase):
         self.assertEqual(json_response["telefone"], item.telefone)
         self.assertEqual(json_response["email"], item.email)
         self.assertEqual(json_response["site"], item.site)
-        self.assertEqual(json_response["endereco"], endereco.id)
         self.assertEqual(json_response["usuario"], item.usuario.id)
+
+        empregador = Empregador.objects.get(pk=item.usuario.id)
+        empresas_empregador = empregador.empresas_usuario.all()
+
+        self.assertEqual(len(empresas_empregador), 1)
 
     def test_retrieve(self):
         if not self.user:
@@ -201,11 +211,43 @@ class CandidatoEmpresaTestCase(AdminEmpresaTestCase):
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 403
+        self.create_fail_status = 403
 
         self.client.force_authenticate(user=self.user)
 
+    def test_create_fail(self):
+        user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
+        endereco = EnderecoFactory()
+        item = EmpresaFactory.stub(usuario=user)
 
-class GuestEmpresaTestCase(AdminEmpresaTestCase):
+        data = {
+            "cnpj": item.cnpj,
+            "razao_social": item.razao_social,
+            "nome_fantasia": item.nome_fantasia,
+            "ramo_atividade": item.ramo_atividade,
+            "numero_funcionarios": item.numero_funcionarios,
+            "descricao": item.descricao,
+            "telefone": item.telefone,
+            "email": item.email,
+            "site": item.site,
+            "endereco": endereco.id,
+            "usuario": item.usuario.id,
+        }
+
+        response = self.client.post(self.uri, data=data)
+
+        self.assertEqual(
+            response.status_code, self.create_fail_status or status.HTTP_403_FORBIDDEN
+        )
+
+        if (
+            self.create_fail_status
+            and self.create_fail_status != status.HTTP_403_FORBIDDEN
+        ):
+            return
+
+
+class GuestEmpresaTestCase(CandidatoEmpresaTestCase):
     def setUp(self):
         self.user = None
         self.client = APIClient()
@@ -215,3 +257,4 @@ class GuestEmpresaTestCase(AdminEmpresaTestCase):
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 401
+        self.create_fail_status = 401

@@ -78,24 +78,6 @@ class AdminEmpregadorTestCase(APITestCase):
         self.assertEqual(json_response["area_atuacao"], data["area_atuacao"])
         self.assertEqual(json_response["cargo"], data["cargo"])
         self.assertEqual(json_response["telefone"], data["telefone"])
-        self.assertEqual(json_response["cnpj"], data["cnpj"])
-        self.assertEqual(json_response["nome_fantasia"], data["nome_fantasia"])
-        self.assertEqual(json_response["razao_social"], data["razao_social"])
-        self.assertEqual(json_response["ramo_atividade"], data["ramo_atividade"])
-        self.assertEqual(
-            json_response["numero_funcionarios"], data["numero_funcionarios"]
-        )
-        self.assertEqual(json_response["empresa_telefone"], data["empresa_telefone"])
-        self.assertEqual(json_response["empresa_email"], data["empresa_email"])
-        self.assertEqual(json_response["site"], data["site"])
-        self.assertEqual(json_response["descricao"], data["descricao"])
-        self.assertEqual(json_response["cep"], data["cep"])
-        self.assertEqual(json_response["logradouro"], data["logradouro"])
-        self.assertEqual(json_response["numero"], data["numero"])
-        self.assertEqual(json_response["complemento"], data["complemento"])
-        self.assertEqual(json_response["bairro"], data["bairro"])
-        self.assertEqual(json_response["cidade"], data["cidade"])
-        self.assertEqual(json_response["estado"], data["estado"])
 
     def test_retrieve(self):
         UserFactory.create_batch(2, nivel_usuario=UsuarioNivelChoices.EMPREGADOR)

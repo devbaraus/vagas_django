@@ -25,6 +25,7 @@ from emprega.permissions import (
     IsCandidatoPermission,
     IsEmpregadorPermission,
     ReadOnlyPermission,
+    DetailPermission,
 )
 from emprega.serializers import (
     EmpresaSerializer,
@@ -43,6 +44,7 @@ from emprega.serializers import (
     EmpregadorListSerializer,
     EmpregadorCreateSerializer,
     CandidatoCreateSerializer,
+    EmpresaCreateSerializer,
 )
 
 
@@ -126,7 +128,10 @@ class CandidatoViews(AbstractViewSet):
 
 
 class EmpresaViews(AbstractViewSet):
-    serializer_class = EmpresaSerializer
+    serializers = {
+        "default": EmpresaSerializer,
+        "create": EmpresaCreateSerializer,
+    }
     queryset = Empresa.objects.all()
     filterset_fields = ["usuario"]
     permission_classes = [
@@ -135,7 +140,11 @@ class EmpresaViews(AbstractViewSet):
         | ReadOnlyPermission,
     ]
 
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers["default"])
+
     def create(self, request, *args, **kwargs):
+        # ADMIN CRIANDO EMPRESA
         user = request.data.get("usuario", request.user.id)
         user = User.objects.get(id=user)
 
@@ -146,6 +155,37 @@ class EmpresaViews(AbstractViewSet):
             )
 
         return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        endereco_data = {
+            "cep": serializer.validated_data.get("cep"),
+            "logradouro": serializer.validated_data.get("logradouro"),
+            "numero": serializer.validated_data.get("numero"),
+            "complemento": serializer.validated_data.get("complemento"),
+            "bairro": serializer.validated_data.get("bairro"),
+            "cidade": serializer.validated_data.get("cidade"),
+            "estado": serializer.validated_data.get("estado"),
+        }
+
+        endereco = Endereco(**endereco_data)
+        endereco.save()
+
+        empresa_data = {
+            "razao_social": serializer.validated_data.get("razao_social"),
+            "cnpj": serializer.validated_data.get("cnpj"),
+            "nome_fantasia": serializer.validated_data.get("nome_fantasia"),
+            "ramo_atividade": serializer.validated_data.get("ramo_atividade"),
+            "numero_funcionarios": serializer.validated_data.get("numero_funcionarios"),
+            "telefone": serializer.validated_data.get("telefone"),
+            "email": serializer.validated_data.get("email"),
+            "site": serializer.validated_data.get("site"),
+            "descricao": serializer.validated_data.get("descricao"),
+        }
+
+        empresa = Empresa(**empresa_data)
+        empresa.usuario = serializer.validated_data.get("usuario")
+        empresa.endereco = endereco
+        empresa.save()
 
 
 class EmpregadorViews(AbstractViewSet):
@@ -215,12 +255,20 @@ class EmpregadorViews(AbstractViewSet):
             empresa.save()
 
 
-class CandidaturaViews(AbstractViewSet):
+class CandidaturaViews(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = CandidaturaSerializer
     queryset = Candidatura.objects.all()
     permission_classes = [
         IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
+        AdminPermission
+        | (IsCandidatoPermission & OwnedByPermission)
+        | ReadOnlyPermission,
     ]
 
 
@@ -269,12 +317,19 @@ class ExperienciaProfissionalViews(AbstractViewSet):
     ]
 
 
-class EnderecoViews(AbstractViewSet):
+class EnderecoViews(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = EnderecoSerializer
     queryset = Endereco.objects.all()
     permission_classes = [
         IsAuthenticated,
-        AdminPermission | (IsEmpregadorPermission & OwnedByPermission),
+        AdminPermission
+        | (IsEmpregadorPermission & OwnedByPermission)
+        | DetailPermission,
     ]
 
 

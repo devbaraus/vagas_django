@@ -14,6 +14,7 @@ from emprega.models import (
     ModeloTrabalhoChoices,
     RegimeContratualChoices,
     Vaga,
+    Candidatura,
 )
 
 import random
@@ -143,3 +144,11 @@ class VagaFactory(DjangoModelFactory):
     quantidade_vagas = factory.Faker("random_int", min=1, max=10)
     beneficios = factory.Faker("text")
     empresa = factory.SubFactory(EmpresaFactory)
+
+
+class CandidaturaFactory(DjangoModelFactory):
+    class Meta:
+        model = Candidatura
+
+    usuario = factory.SubFactory(UserFactory)
+    vaga = factory.SubFactory(VagaFactory)
