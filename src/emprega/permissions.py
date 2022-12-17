@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework.permissions import SAFE_METHODS
 
-from emprega.models import UsuarioNivelChoices, Empresa, Vaga, Endereco, Candidatura
+from emprega.models import UsuarioNivelChoices, Vaga, Endereco
 
 
 class OwnedByPermission(permissions.BasePermission):
@@ -22,7 +22,7 @@ class OwnedByPermission(permissions.BasePermission):
 
         if (
             isinstance(obj, Endereco)
-            and request.user.usuario_empresa.empresa.endereco == obj
+            and request.user.empresas_usuario.filter(endereco=obj).exists()
         ):
             return True
 
@@ -86,7 +86,10 @@ class IsCandidatoPermission(permissions.BasePermission):
         if not bool(request.user) or request.user.is_anonymous:
             return False
 
-        if request.user.nivel_usuario == UsuarioNivelChoices.CANDIDATO:
+        if (
+            request.user.nivel_usuario == UsuarioNivelChoices.CANDIDATO
+            and obj.usuario == request.user
+        ):
             return True
 
         return False
@@ -118,7 +121,7 @@ class DeletePermission(permissions.BasePermission):
 
 class DetailPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method == "GET" and request.action == "retrieve":
+        if request.method == "GET" and view.action == "retrieve":
             return True
         return False
 

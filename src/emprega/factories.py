@@ -1,7 +1,9 @@
+import random
+
 import factory
 from django.contrib.auth.hashers import make_password
+from factory import fuzzy
 from factory.django import DjangoModelFactory
-from factory import fuzzy, faker
 
 from emprega.models import (
     User,
@@ -15,9 +17,13 @@ from emprega.models import (
     RegimeContratualChoices,
     Vaga,
     Candidatura,
+    IdiomaNivelChoices,
+    Idioma,
+    FormacaoAcademica,
+    FormacaoNivelChoices,
+    ExperienciaProfissional,
+    CursoEspecializacao,
 )
-
-import random
 
 
 def generate_cpf():
@@ -152,3 +158,52 @@ class CandidaturaFactory(DjangoModelFactory):
 
     usuario = factory.SubFactory(UserFactory)
     vaga = factory.SubFactory(VagaFactory)
+
+
+class IdiomaFactory(DjangoModelFactory):
+    class Meta:
+        model = Idioma
+
+    nome = factory.Faker("language_name")
+    nivel = factory.lazy_attribute(
+        lambda _: random.choice(IdiomaNivelChoices.choices)[0]
+    )
+    usuario = factory.SubFactory(UserFactory)
+
+
+class FormacaoAcademicaFactory(DjangoModelFactory):
+    class Meta:
+        model = FormacaoAcademica
+
+    instituicao = factory.Faker("company")
+    curso = factory.Faker("job")
+    nivel = factory.lazy_attribute(
+        lambda _: random.choice(FormacaoNivelChoices.choices)[0]
+    )
+    data_inicio = factory.Faker("date")
+    data_conclusao = factory.Faker("date")
+    usuario = factory.SubFactory(UserFactory)
+
+
+class ExperienciaProfissionalFactory(DjangoModelFactory):
+    class Meta:
+        model = ExperienciaProfissional
+
+    empresa = factory.Faker("company")
+    cargo = factory.Faker("job")
+    salario = fuzzy.FuzzyDecimal(1000, 10000, precision=2)
+    atividades = factory.Faker("text")
+    data_inicio = factory.Faker("date")
+    data_fim = factory.Faker("date")
+    usuario = factory.SubFactory(UserFactory)
+
+
+class CursoEspecializacaoFactory(DjangoModelFactory):
+    class Meta:
+        model = CursoEspecializacao
+
+    instituicao = factory.Faker("company")
+    curso = factory.Faker("job")
+    duracao_horas = factory.Faker("random_int", min=1, max=1000)
+    data_conclusao = factory.Faker("date")
+    usuario = factory.SubFactory(UserFactory)

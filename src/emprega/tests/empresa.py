@@ -4,7 +4,6 @@ from rest_framework.test import APITestCase, APIClient
 from emprega.factories import (
     UserFactory,
     EmpresaFactory,
-    VagaFactory,
     EnderecoFactory,
 )
 from emprega.models import UsuarioNivelChoices, Vaga, Empregador

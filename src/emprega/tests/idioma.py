@@ -3,34 +3,32 @@ from rest_framework.test import APITestCase, APIClient
 
 from emprega.factories import (
     UserFactory,
-    EmpresaFactory,
-    VagaFactory,
-    CandidaturaFactory,
+    IdiomaFactory,
 )
-from emprega.models import UsuarioNivelChoices, Candidatura
+from emprega.models import UsuarioNivelChoices, Idioma
 
 
-class AdminCandidaturaTestCase(APITestCase):
+class AdminIdiomaTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.ADMIN)
-
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/idioma/"
         self.create_status = 201
+        self.update_status = 200
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 204
+        self.detail_other_status = 200
 
         self.client.force_authenticate(user=self.user)
 
     def test_create(self):
-        user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
-        empresa = EmpresaFactory(usuario=user)
-        vaga = VagaFactory(empresa=empresa)
+        item = IdiomaFactory.stub(usuario=self.user)
 
         data = {
+            "nome": item.nome,
+            "nivel": item.nivel,
             "usuario": self.user.id,
-            "vaga": vaga.id,
         }
 
         response = self.client.post(self.uri, data=data)
@@ -44,15 +42,12 @@ class AdminCandidaturaTestCase(APITestCase):
 
         json_response = response.json()
 
-        self.assertEqual(json_response["usuario"], data["usuario"])
-        self.assertEqual(json_response["vaga"], data["vaga"])
+        self.assertEqual(json_response["nome"], item.nome)
+        self.assertEqual(json_response["nivel"], item.nivel)
+        self.assertEqual(json_response["usuario"], self.user.id)
 
     def test_retrieve(self):
-        user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
-        empresa = EmpresaFactory(usuario=user)
-        vaga = VagaFactory(empresa=empresa)
-
-        CandidaturaFactory.create_batch(2, vaga=vaga, usuario=self.user)
+        IdiomaFactory.create_batch(2, usuario=self.user)
 
         response = self.client.get(self.uri)
 
@@ -68,11 +63,7 @@ class AdminCandidaturaTestCase(APITestCase):
         self.assertEqual(len(json_response), 2)
 
     def test_detail(self):
-        user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
-        empresa = EmpresaFactory(usuario=user)
-        vaga = VagaFactory(empresa=empresa)
-
-        item = CandidaturaFactory(vaga=vaga, usuario=self.user)
+        item = IdiomaFactory(usuario=self.user)
 
         response = self.client.get(f"{self.uri}{item.id}/")
 
@@ -83,16 +74,35 @@ class AdminCandidaturaTestCase(APITestCase):
 
         json_response = response.json()
 
-        self.assertEqual(json_response["id"], item.id)
-        self.assertEqual(json_response["vaga"], item.vaga.id)
-        self.assertEqual(json_response["usuario"], item.usuario.id)
+        self.assertEqual(json_response["nome"], item.nome)
+        self.assertEqual(json_response["nivel"], item.nivel)
+        self.assertEqual(json_response["usuario"], self.user.id)
+
+    def test_update(self):
+        item = IdiomaFactory(usuario=self.user)
+
+        item_stub = IdiomaFactory.stub(usuario=self.user)
+
+        data = {
+            "nome": item_stub.nome,
+            "nivel": item_stub.nivel,
+        }
+
+        response = self.client.put(f"{self.uri}{item.id}/", data=data)
+
+        self.assertEqual(response.status_code, self.update_status or status.HTTP_200_OK)
+
+        if self.update_status and self.update_status != status.HTTP_200_OK:
+            return
+
+        json_response = response.json()
+
+        self.assertEqual(json_response["nome"], item_stub.nome)
+        self.assertEqual(json_response["nivel"], item_stub.nivel)
+        self.assertEqual(json_response["usuario"], self.user.id)
 
     def test_delete(self):
-        user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
-        empresa = EmpresaFactory(usuario=user)
-        vaga = VagaFactory(empresa=empresa)
-
-        item = CandidaturaFactory(vaga=vaga, usuario=self.user)
+        item = IdiomaFactory(usuario=self.user)
 
         response = self.client.delete(f"{self.uri}{item.id}/")
 
@@ -103,44 +113,55 @@ class AdminCandidaturaTestCase(APITestCase):
         if self.delete_status and self.delete_status != status.HTTP_204_NO_CONTENT:
             return
 
-        self.assertEqual(Candidatura.objects.count(), 0)
+        self.assertEqual(Idioma.objects.count(), 0)
+
+    def test_detail_other(self):
+        item = IdiomaFactory()
+        response = self.client.get(f"{self.uri}{item.id}/")
+
+        self.assertEqual(
+            response.status_code, self.detail_other_status or status.HTTP_403_FORBIDDEN
+        )
 
 
-class EmpregadorCandidaturaTestCase(AdminCandidaturaTestCase):
+class EmpregadorIdiomaTestCase(AdminIdiomaTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/idioma/"
         self.create_status = 403
+        self.update_status = 403
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 403
+        self.detail_other_status = 200
 
         self.client.force_authenticate(user=self.user)
 
 
-class CandidatoCandidaturaTestCase(AdminCandidaturaTestCase):
+class CandidatoIdiomaTestCase(AdminIdiomaTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/idioma/"
         self.create_status = 201
+        self.update_status = 200
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 204
+        self.detail_other_status = 403
 
         self.client.force_authenticate(user=self.user)
 
-    def test_delete(self):
-        super().test_delete()
 
-
-class GuestCandidaturaTestCase(AdminCandidaturaTestCase):
+class GuestIdiomaTestCase(AdminIdiomaTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/idioma/"
         self.create_status = 401
+        self.update_status = 401
         self.retrieve_status = 401
         self.detail_status = 401
         self.delete_status = 401
+        self.detail_other_status = 401

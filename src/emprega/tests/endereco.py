@@ -4,10 +4,8 @@ from rest_framework.test import APITestCase, APIClient
 from emprega.factories import (
     UserFactory,
     EmpresaFactory,
-    VagaFactory,
-    EnderecoFactory,
 )
-from emprega.models import UsuarioNivelChoices, Vaga
+from emprega.models import UsuarioNivelChoices
 
 
 class AdminEnderecoTestCase(APITestCase):
@@ -41,8 +39,6 @@ class AdminEnderecoTestCase(APITestCase):
         json_response = response.json()
 
         self.assertEqual(len(json_response), 2)
-
-        print(json_response)
 
     def test_detail(self):
         if not self.user:
@@ -119,6 +115,9 @@ class EmpregadorEnderecoTestCase(AdminEnderecoTestCase):
         self.delete_status = 204
 
         self.client.force_authenticate(user=self.user)
+
+    def test_detail(self):
+        super().test_detail()
 
 
 class CandidatoEnderecoTestCase(AdminEnderecoTestCase):

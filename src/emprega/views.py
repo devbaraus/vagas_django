@@ -59,6 +59,37 @@ class AbstractViewSet(
     permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission, OwnedByPermission]
 
 
+class CandidatoPropertiesViewSet(AbstractViewSet):
+    permission_classes = [
+        IsAuthenticated,
+        AdminPermission
+        | (IsCandidatoPermission & OwnedByPermission)
+        | ReadOnlyPermission,
+    ]
+
+    def get_permissions(self):
+        if self.action == "retrieve":
+            self.permission_classes = [
+                IsAuthenticated,
+                AdminPermission | OwnedByPermission | IsEmpregadorPermission,
+            ]
+        return super().get_permissions()
+
+    def update(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data["usuario"] = request.data.get("usuario", request.user.id)
+        request.data._mutable = False
+
+        return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data["usuario"] = request.data.get("usuario", request.user.id)
+        request.data._mutable = False
+
+        return super().create(request, *args, **kwargs)
+
+
 class UserViews(AbstractViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -272,49 +303,29 @@ class CandidaturaViews(
     ]
 
 
-class ObjetivoProfissionalViews(AbstractViewSet):
+class ObjetivoProfissionalViews(CandidatoPropertiesViewSet):
     serializer_class = ObjetivoProfissionalSerializer
     queryset = ObjetivoProfissional.objects.all()
-    permission_classes = [
-        IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
-    ]
 
 
-class IdiomaViews(AbstractViewSet):
+class IdiomaViews(CandidatoPropertiesViewSet):
     serializer_class = IdiomaSerializer
     queryset = Idioma.objects.all()
-    permission_classes = [
-        IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
-    ]
 
 
-class CursoEspecializacaoViews(AbstractViewSet):
+class CursoEspecializacaoViews(CandidatoPropertiesViewSet):
     serializer_class = CursoEspecializacaoSerializer
     queryset = CursoEspecializacao.objects.all()
-    permission_classes = [
-        IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
-    ]
 
 
-class FormacaoAcademicaViews(AbstractViewSet):
+class FormacaoAcademicaViews(CandidatoPropertiesViewSet):
     serializer_class = FormacaoAcademicaSerializer
     queryset = FormacaoAcademica.objects.all()
-    permission_classes = [
-        IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
-    ]
 
 
-class ExperienciaProfissionalViews(AbstractViewSet):
+class ExperienciaProfissionalViews(CandidatoPropertiesViewSet):
     serializer_class = ExperienciaProfissionalSerializer
     queryset = ExperienciaProfissional.objects.all()
-    permission_classes = [
-        IsAuthenticated,
-        AdminPermission | (IsCandidatoPermission & OwnedByPermission),
-    ]
 
 
 class EnderecoViews(
