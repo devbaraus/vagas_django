@@ -127,12 +127,17 @@ class CandidatoEnderecoTestCase(AdminEnderecoTestCase):
         self.uri = "/endereco/"
         self.create_status = 403
         self.update_status = 403
-        self.retrieve_status = 200
+        self.retrieve_status = 403
         self.detail_status = 200
         self.delete_status = 403
 
         self.client.force_authenticate(user=self.user)
 
+    def test_detail(self):
+        super().test_detail()
+
+    def test_retrieve(self):
+        super().test_retrieve()
 
 class GuestEnderecoTestCase(AdminEnderecoTestCase):
     def setUp(self):
@@ -141,6 +146,6 @@ class GuestEnderecoTestCase(AdminEnderecoTestCase):
         self.uri = "/endereco/"
         self.create_status = 401
         self.update_status = 401
-        self.retrieve_status = 200
+        self.retrieve_status = 401
         self.detail_status = 200
         self.delete_status = 401

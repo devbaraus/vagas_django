@@ -23,6 +23,7 @@ from emprega.models import (
     FormacaoNivelChoices,
     ExperienciaProfissional,
     CursoEspecializacao,
+    Avaliacao,
 )
 
 
@@ -155,6 +156,14 @@ class VagaFactory(DjangoModelFactory):
 class CandidaturaFactory(DjangoModelFactory):
     class Meta:
         model = Candidatura
+
+    usuario = factory.SubFactory(UserFactory)
+    vaga = factory.SubFactory(VagaFactory)
+
+
+class AvaliacaoFactory(DjangoModelFactory):
+    class Meta:
+        model = Avaliacao
 
     usuario = factory.SubFactory(UserFactory)
     vaga = factory.SubFactory(VagaFactory)

@@ -304,7 +304,9 @@ class CursoEspecializacao(AbstractBaseModel):
     curso = models.CharField(verbose_name="Curso", max_length=255)
     data_conclusao = models.DateField(verbose_name="Data de conclusão")
     duracao_horas = models.IntegerField(verbose_name="Duração em horas")
-    certificado = models.FileField(verbose_name="Certificado", null=True, upload_to="certificados")
+    certificado = models.FileField(
+        verbose_name="Certificado", null=True, upload_to="certificados"
+    )
 
     usuario = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="cursos_especializacao_usuario"
@@ -418,8 +420,26 @@ class Candidatura(AbstractBaseModel):
         User, on_delete=models.CASCADE, related_name="candidaturas_usuario"
     )
 
+    class Meta:
+        unique_together = ("vaga", "usuario")
+
     def __str__(self):
-        return self.vaga.cargo
+        return self.vaga.cargo + " - " + self.usuario.cpf
+
+
+class Avaliacao(AbstractBaseModel):
+    vaga = models.ForeignKey(
+        Vaga, on_delete=models.CASCADE, related_name="avaliacoes_vaga"
+    )
+    usuario = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="avaliacoes_usuario"
+    )
+
+    class Meta:
+        unique_together = ("vaga", "usuario")
+
+    def __str__(self):
+        return self.vaga.cargo + " - " + self.usuario.cpf
 
 
 auditlog.register(User)
@@ -434,3 +454,4 @@ auditlog.register(ObjetivoProfissional)
 auditlog.register(Idioma)
 auditlog.register(ExperienciaProfissional)
 auditlog.register(CursoEspecializacao)
+auditlog.register(Avaliacao)

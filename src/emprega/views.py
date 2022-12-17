@@ -17,6 +17,7 @@ from emprega.models import (
     Empregador,
     User,
     UsuarioNivelChoices,
+    Avaliacao,
 )
 from emprega.permissions import (
     AdminPermission,
@@ -45,6 +46,7 @@ from emprega.serializers import (
     EmpregadorCreateSerializer,
     CandidatoCreateSerializer,
     EmpresaCreateSerializer,
+    AvaliacaoSerializer,
 )
 
 
@@ -100,16 +102,7 @@ class UserViews(AbstractViewSet):
         request.data.setdefault("nivel_usuario", UsuarioNivelChoices.ADMIN)
         request.data._mutable = False
 
-        serializer = self.get_serializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-
-        self.perform_create(serializer)
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        return super().create(request, *args, **kwargs)
 
 
 class CandidatoViews(AbstractViewSet):
@@ -303,9 +296,35 @@ class CandidaturaViews(
     ]
 
 
-class ObjetivoProfissionalViews(CandidatoPropertiesViewSet):
+class ObjetivoProfissionalViews(
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = ObjetivoProfissionalSerializer
     queryset = ObjetivoProfissional.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+        AdminPermission
+        | (IsCandidatoPermission & OwnedByPermission)
+        | DetailPermission,
+    ]
+
+    def get_permissions(self):
+        if self.action == "retrieve":
+            self.permission_classes = [
+                IsAuthenticated,
+                AdminPermission | OwnedByPermission | IsEmpregadorPermission,
+            ]
+        return super().get_permissions()
+
+    def update(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data["usuario"] = request.data.get("usuario", request.user.id)
+        request.data._mutable = False
+
+        return super().update(request, *args, **kwargs)
 
 
 class IdiomaViews(CandidatoPropertiesViewSet):
@@ -337,7 +356,7 @@ class EnderecoViews(
     serializer_class = EnderecoSerializer
     queryset = Endereco.objects.all()
     permission_classes = [
-        IsAuthenticated,
+        IsAuthenticatedOrReadOnly,
         AdminPermission
         | (IsEmpregadorPermission & OwnedByPermission)
         | DetailPermission,
@@ -351,5 +370,16 @@ class VagaViews(AbstractViewSet):
         IsAuthenticatedOrReadOnly,
         AdminPermission
         | (IsEmpregadorPermission & OwnedByPermission)
+        | ReadOnlyPermission,
+    ]
+
+
+class AvaliacaoViews(AbstractViewSet):
+    serializer_class = AvaliacaoSerializer
+    queryset = Avaliacao.objects.all()
+    permission_classes = [
+        IsAuthenticated,
+        AdminPermission
+        | (IsCandidatoPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]

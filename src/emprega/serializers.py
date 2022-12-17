@@ -14,7 +14,7 @@ from emprega.models import (
     Candidato,
     User,
     ModeloTrabalhoChoices,
-    RegimeContratualChoices,
+    RegimeContratualChoices, Avaliacao,
 )
 
 
@@ -175,22 +175,37 @@ class VagaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AvaliacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avaliacao
+        fields = "__all__"
+
+
 class ObjetivoProfissionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ObjetivoProfissional
         fields = "__all__"
+        extra_kwargs = {
+            "usuario": {"required": False},
+        }
 
 
 class FormacaoAcademicaSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormacaoAcademica
         fields = "__all__"
+        extra_kwargs = {
+            "usuario": {"required": False},
+        }
 
 
 class ExperienciaProfissionalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExperienciaProfissional
         fields = "__all__"
+        extra_kwargs = {
+            "usuario": {"required": False},
+        }
 
 
 class IdiomaSerializer(serializers.ModelSerializer):
@@ -206,6 +221,9 @@ class CursoEspecializacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoEspecializacao
         fields = "__all__"
+        extra_kwargs = {
+            "usuario": {"required": False},
+        }
 
 
 class CandidaturaSerializer(serializers.ModelSerializer):

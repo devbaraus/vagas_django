@@ -1,3 +1,4 @@
+from emprega.tests.avaliacao import *
 from emprega.tests.candidato import *
 from emprega.tests.candidatura import *
 from emprega.tests.curso_especializacao import *
@@ -7,5 +8,6 @@ from emprega.tests.endereco import *
 from emprega.tests.experiencia_profissional import *
 from emprega.tests.formacao_academica import *
 from emprega.tests.idioma import *
+from emprega.tests.objetivo_profissional import *
 from emprega.tests.user import *
 from emprega.tests.vaga import *

@@ -5,17 +5,17 @@ from emprega.factories import (
     UserFactory,
     EmpresaFactory,
     VagaFactory,
-    CandidaturaFactory,
+    AvaliacaoFactory,
 )
-from emprega.models import UsuarioNivelChoices, Candidatura
+from emprega.models import UsuarioNivelChoices, Avaliacao
 
 
-class AdminCandidaturaTestCase(APITestCase):
+class AdminAvaliacaoTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.ADMIN)
 
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/avaliacao/"
         self.create_status = 201
         self.retrieve_status = 200
         self.detail_status = 200
@@ -53,8 +53,8 @@ class AdminCandidaturaTestCase(APITestCase):
         vaga1 = VagaFactory(empresa=empresa)
         vaga2 = VagaFactory(empresa=empresa)
 
-        CandidaturaFactory(vaga=vaga1, usuario=self.user)
-        CandidaturaFactory(vaga=vaga2, usuario=self.user)
+        AvaliacaoFactory(vaga=vaga1, usuario=self.user)
+        AvaliacaoFactory(vaga=vaga2, usuario=self.user)
 
         response = self.client.get(self.uri)
 
@@ -74,7 +74,7 @@ class AdminCandidaturaTestCase(APITestCase):
         empresa = EmpresaFactory(usuario=user)
         vaga = VagaFactory(empresa=empresa)
 
-        item = CandidaturaFactory(vaga=vaga, usuario=self.user)
+        item = AvaliacaoFactory(vaga=vaga, usuario=self.user)
 
         response = self.client.get(f"{self.uri}{item.id}/")
 
@@ -94,7 +94,7 @@ class AdminCandidaturaTestCase(APITestCase):
         empresa = EmpresaFactory(usuario=user)
         vaga = VagaFactory(empresa=empresa)
 
-        item = CandidaturaFactory(vaga=vaga, usuario=self.user)
+        item = AvaliacaoFactory(vaga=vaga, usuario=self.user)
 
         response = self.client.delete(f"{self.uri}{item.id}/")
 
@@ -105,14 +105,14 @@ class AdminCandidaturaTestCase(APITestCase):
         if self.delete_status and self.delete_status != status.HTTP_204_NO_CONTENT:
             return
 
-        self.assertEqual(Candidatura.objects.count(), 0)
+        self.assertEqual(Avaliacao.objects.count(), 0)
 
 
-class EmpregadorCandidaturaTestCase(AdminCandidaturaTestCase):
+class EmpregadorAvaliacaoTestCase(AdminAvaliacaoTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/avaliacao/"
         self.create_status = 403
         self.retrieve_status = 200
         self.detail_status = 200
@@ -121,11 +121,11 @@ class EmpregadorCandidaturaTestCase(AdminCandidaturaTestCase):
         self.client.force_authenticate(user=self.user)
 
 
-class CandidatoCandidaturaTestCase(AdminCandidaturaTestCase):
+class CandidatoAvaliacaoTestCase(AdminAvaliacaoTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/avaliacao/"
         self.create_status = 201
         self.retrieve_status = 200
         self.detail_status = 200
@@ -137,11 +137,11 @@ class CandidatoCandidaturaTestCase(AdminCandidaturaTestCase):
         super().test_delete()
 
 
-class GuestCandidaturaTestCase(AdminCandidaturaTestCase):
+class GuestAvaliacaoTestCase(AdminAvaliacaoTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
-        self.uri = "/candidatura/"
+        self.uri = "/avaliacao/"
         self.create_status = 401
         self.retrieve_status = 401
         self.detail_status = 401

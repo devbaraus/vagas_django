@@ -2,7 +2,7 @@ from rest_framework.routers import DefaultRouter
 
 from emprega.views import EmpresaViews, CandidaturaViews, ObjetivoProfissionalViews, IdiomaViews, \
     CursoEspecializacaoViews, FormacaoAcademicaViews, ExperienciaProfissionalViews, EnderecoViews, VagaViews, \
-    EmpregadorViews, CandidatoViews, UserViews
+    EmpregadorViews, CandidatoViews, UserViews, AvaliacaoViews
 
 app_name = 'emprega_api'
 
@@ -20,5 +20,6 @@ router.register('formacao_academica', FormacaoAcademicaViews, basename='formacao
 router.register('experiencia_profissional', ExperienciaProfissionalViews, basename='experiencia_profissional')
 router.register('endereco', EnderecoViews, basename='endereco')
 router.register('vaga', VagaViews, basename='vaga')
+router.register('avaliacao', AvaliacaoViews, basename='avaliacao')
 
 urlpatterns = router.urls
