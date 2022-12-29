@@ -20,11 +20,11 @@ def validate_cpf(cpf: str) -> str:
     Exemplos:
 
     >>> validate_cpf('529.982.247-25')
-    True
+    Raises ValidationError
     >>> validate_cpf('52998224725')
-    True
+    '52998224725'
     >>> validate_cpf('111.111.111-11')
-    False
+    Raises ValidationError
     """
 
     # # Verifica a formatação do CPF
@@ -32,6 +32,10 @@ def validate_cpf(cpf: str) -> str:
     #     return False
 
     # Obtém apenas os números do CPF, ignorando pontuações
+
+    if not cpf.isdigit():
+        raise ValidationError("CNPJ deve possuir apenas números.")
+
     numbers = [int(digit) for digit in cpf if digit.isdigit()]
 
     # Verifica se o CPF possui 11 números ou se todos são iguais:
@@ -71,11 +75,11 @@ def validate_cnpj(cnpj: str) -> str:
     Exemplos:
 
     >>> validate_cnpj('85059325000100')
-    True
+    '85059325000100'
     >>> validate_cnpj("0" * 14)
-    False
+    Raises ValidationError
     >>> validate_cnpj('77437514000133')
-    True
+    '77437514000133'
     """
 
     cnpj = "".join(re.findall("\d", cnpj))

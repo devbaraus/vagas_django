@@ -52,7 +52,7 @@ class AdminEmpregadorTestCase(APITestCase):
             "data_nascimento": user.data_nascimento.strftime("%Y-%m-%d"),
             "sexo": user.sexo,
             "estado_civil": user.estado_civil,
-            "area_atuacao": user.area_atuacao,
+            "atuacao": user.atuacao,
             "cargo": user.cargo,
             "email": user.email,
             "telefone": user.telefone,
@@ -75,7 +75,7 @@ class AdminEmpregadorTestCase(APITestCase):
         self.assertEqual(json_response["data_nascimento"], data["data_nascimento"])
         self.assertEqual(json_response["sexo"], data["sexo"])
         self.assertEqual(json_response["estado_civil"], data["estado_civil"])
-        self.assertEqual(json_response["area_atuacao"], data["area_atuacao"])
+        self.assertEqual(json_response["atuacao"], data["atuacao"])
         self.assertEqual(json_response["cargo"], data["cargo"])
         self.assertEqual(json_response["telefone"], data["telefone"])
 

@@ -6,6 +6,14 @@ from django.db import models
 from emprega.validators import validate_cpf, validate_cnpj
 
 
+class AbstractBaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class UsuarioNivelChoices(models.IntegerChoices):
     SUPERADMIN = 1, "Super Admin"
     ADMIN = 2, "Administrador"
@@ -17,6 +25,7 @@ class SexoChoices(models.IntegerChoices):
     FEMININO = 1, "Feminino"
     MASCULINO = 2, "Masculino"
     NAOINFORMADO = 3, "Não Informado"
+    AMBOS = 4, "Ambos"
 
 
 class EstadoCivilChoices(models.IntegerChoices):
@@ -53,18 +62,10 @@ class JornadaTrabalhoChoices(models.IntegerChoices):
     TEMPO_FLEXIVEL = 3, "Tempo Flexível"
 
 
-class AbstractBaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
 class TipoDeficienciaChoices(models.IntegerChoices):
     AUDITIVA = 1, "Auditiva"
     MENTAL = 2, "Mental"
-    MOTORA = 3, "Física"
+    FISICA = 3, "Física"
     VISUAL = 4, "Visual"
     MULTIPLO = 5, "Múltiplo"
     OUTRO = 6, "Outro"
@@ -146,7 +147,7 @@ class EmpregadorManager(models.Manager):
         )
 
 
-class User(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
+class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
     nivel_usuario = models.PositiveSmallIntegerField(
         verbose_name="Nível de Usuário",
         default=UsuarioNivelChoices.CANDIDATO,
@@ -173,7 +174,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
         choices=TipoDeficienciaChoices.choices,
     )
 
-    area_atuacao = models.CharField(
+    atuacao = models.CharField(
         verbose_name="Área de atuação", max_length=255, null=True, blank=True
     )
     cargo = models.CharField(
@@ -207,7 +208,7 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
         return self.nome
 
 
-class Candidato(User):
+class Candidato(Usuario):
     objects = CandidatoManager()
 
     class Meta:
@@ -216,7 +217,7 @@ class Candidato(User):
         verbose_name_plural = "Candidatos"
 
 
-class Empregador(User):
+class Empregador(Usuario):
     objects = EmpregadorManager()
 
     class Meta:
@@ -236,12 +237,12 @@ class ObjetivoProfissional(AbstractBaseModel):
     regime_contratual = models.PositiveSmallIntegerField(
         verbose_name="Regime contratual", choices=RegimeContratualChoices.choices
     )
-    jornada_trabalho = models.CharField(
-        verbose_name="Jornada de trabalho", max_length=255
+    jornada_trabalho = models.PositiveSmallIntegerField(
+        verbose_name="Jornada de trabalho", choices=JornadaTrabalhoChoices.choices
     )
 
     usuario = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="objetivo_profissional_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="objetivo_profissional_usuario"
     )
 
     def __str__(self):
@@ -255,7 +256,7 @@ class Idioma(AbstractBaseModel):
     )
 
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="idiomas_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="idiomas_usuario"
     )
 
     def __str__(self):
@@ -269,10 +270,10 @@ class FormacaoAcademica(AbstractBaseModel):
         verbose_name="Nível", choices=FormacaoNivelChoices.choices
     )
     data_inicio = models.DateField(verbose_name="Data de início")
-    data_conclusao = models.DateField(verbose_name="Data de conclusão")
+    data_conclusao = models.DateField(verbose_name="Data de conclusão", null=True)
 
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="formacoes_academicas_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="formacoes_academicas_usuario"
     )
 
     def __str__(self):
@@ -283,14 +284,14 @@ class ExperienciaProfissional(AbstractBaseModel):
     empresa = models.CharField(verbose_name="Empresa", max_length=255)
     cargo = models.CharField(verbose_name="Cargo", max_length=255)
     salario = models.DecimalField(
-        verbose_name="Salário", max_digits=10, decimal_places=2
+        verbose_name="Salário", max_digits=10, decimal_places=2, null=True
     )
     atividades = models.TextField(verbose_name="Atividades")
     data_inicio = models.DateField(verbose_name="Data de início")
-    data_fim = models.DateField(verbose_name="Data de fim")
+    data_fim = models.DateField(verbose_name="Data de fim", null=True)
 
     usuario = models.ForeignKey(
-        User,
+        Usuario,
         on_delete=models.CASCADE,
         related_name="experiencias_profissionais_usuario",
     )
@@ -309,7 +310,7 @@ class CursoEspecializacao(AbstractBaseModel):
     )
 
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="cursos_especializacao_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="cursos_especializacao_usuario"
     )
 
     def __str__(self):
@@ -360,7 +361,7 @@ class Empresa(AbstractBaseModel):
     descricao = models.TextField(verbose_name="Descrição", null=True, blank=True)
 
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="empresas_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="empresas_usuario"
     )
     endereco = models.OneToOneField(
         Endereco, on_delete=models.SET_NULL, null=True, related_name="empresa_endereco"
@@ -417,7 +418,7 @@ class Candidatura(AbstractBaseModel):
         Vaga, on_delete=models.CASCADE, related_name="candidaturas_vaga"
     )
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="candidaturas_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="candidaturas_usuario"
     )
 
     class Meta:
@@ -432,7 +433,7 @@ class Avaliacao(AbstractBaseModel):
         Vaga, on_delete=models.CASCADE, related_name="avaliacoes_vaga"
     )
     usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="avaliacoes_usuario"
+        Usuario, on_delete=models.CASCADE, related_name="avaliacoes_usuario"
     )
 
     class Meta:
@@ -442,7 +443,7 @@ class Avaliacao(AbstractBaseModel):
         return self.vaga.cargo + " - " + self.usuario.cpf
 
 
-auditlog.register(User)
+auditlog.register(Usuario)
 auditlog.register(Candidato)
 auditlog.register(Empregador)
 auditlog.register(Endereco)

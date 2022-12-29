@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import mixins, viewsets, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -15,7 +16,7 @@ from emprega.models import (
     Vaga,
     Candidato,
     Empregador,
-    User,
+    Usuario,
     UsuarioNivelChoices,
     Avaliacao,
 )
@@ -40,13 +41,15 @@ from emprega.serializers import (
     VagaSerializer,
     CandidatoSerializer,
     EmpregadorSerializer,
-    UserSerializer,
+    UsuarioSerializer,
     CandidatoListSerializer,
     EmpregadorListSerializer,
     EmpregadorCreateSerializer,
     CandidatoCreateSerializer,
     EmpresaCreateSerializer,
     AvaliacaoSerializer,
+    CandidatoPerfilSerializer,
+    EmpregadorPerfilSerializer,
 )
 
 
@@ -77,24 +80,37 @@ class CandidatoPropertiesViewSet(AbstractViewSet):
             ]
         return super().get_permissions()
 
-    def update(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data["usuario"] = request.data.get("usuario", request.user.id)
-        request.data._mutable = False
+    def get_queryset(self):
+        if self.action == "retrieve" and not self.request.user.is_staff:
+            return self.queryset.filter(usuario=self.request.user)
+        return self.queryset
 
-        return super().update(request, *args, **kwargs)
+    def perform_update(self, serializer):
+        usuario = self.request.data.get("usuario")
 
-    def create(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data["usuario"] = request.data.get("usuario", request.user.id)
-        request.data._mutable = False
+        if isinstance(usuario, int):
+            usuario = Candidato.objects.get(id=usuario)
 
-        return super().create(request, *args, **kwargs)
+        if not usuario:
+            usuario = self.request.user
+
+        serializer.save(usuario=usuario)
+
+    def perform_create(self, serializer):
+        usuario = self.request.data.get("usuario")
+
+        if isinstance(usuario, int):
+            usuario = Candidato.objects.get(id=usuario)
+
+        if not usuario:
+            usuario = self.request.user
+
+        serializer.save(usuario=usuario)
 
 
 class UserViews(AbstractViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
+    serializer_class = UsuarioSerializer
+    queryset = Usuario.objects.all()
     permission_classes = [IsAuthenticated, AdminPermission]
 
     def create(self, request, *args, **kwargs):
@@ -110,6 +126,7 @@ class CandidatoViews(AbstractViewSet):
         "default": CandidatoSerializer,
         "list": CandidatoListSerializer,
         "create": CandidatoCreateSerializer,
+        "perfil": CandidatoPerfilSerializer,
     }
     queryset = Candidato.objects.all()
     permission_classes = [
@@ -119,36 +136,10 @@ class CandidatoViews(AbstractViewSet):
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers["default"])
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            user_data = {
-                "nome": serializer.validated_data.get("nome"),
-                "cpf": serializer.validated_data.get("cpf"),
-                "data_nascimento": serializer.validated_data.get("data_nascimento"),
-                "sexo": serializer.validated_data.get("sexo"),
-                "estado_civil": serializer.validated_data.get("estado_civil"),
-                "tipo_deficiencia": serializer.validated_data.get("tipo_deficiencia"),
-                "email": serializer.validated_data.get("email"),
-                "telefone": serializer.validated_data.get("telefone"),
-                # 'foto': serializer.validated_data.get('foto'),
-                # 'curriculo': serializer.validated_data.get('curriculo'),
-                "nivel_usuario": UsuarioNivelChoices.CANDIDATO,
-            }
-
-            user = Candidato(**user_data)
-            user.save()
-
-            objetivo_profissional_data = {
-                "cargo": serializer.validated_data.get("cargo"),
-                "salario": serializer.validated_data.get("salario"),
-                "modelo_trabalho": serializer.validated_data.get("modelo_trabalho"),
-                "jornada_trabalho": serializer.validated_data.get("jornada_trabalho"),
-                "regime_contratual": serializer.validated_data.get("regime_contratual"),
-            }
-
-            objetivo_profissional = ObjetivoProfissional(**objetivo_profissional_data)
-            objetivo_profissional.usuario = user
-            objetivo_profissional.save()
+    @action(detail=False, methods=["GET"])
+    def perfil(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(request.user)
+        return Response(serializer.data)
 
 
 class EmpresaViews(AbstractViewSet):
@@ -170,7 +161,7 @@ class EmpresaViews(AbstractViewSet):
     def create(self, request, *args, **kwargs):
         # ADMIN CRIANDO EMPRESA
         user = request.data.get("usuario", request.user.id)
-        user = User.objects.get(id=user)
+        user = Usuario.objects.get(id=user)
 
         if user.nivel_usuario != UsuarioNivelChoices.EMPREGADOR:
             return Response(
@@ -217,6 +208,7 @@ class EmpregadorViews(AbstractViewSet):
         "default": EmpregadorSerializer,
         "create": EmpregadorCreateSerializer,
         "list": EmpregadorListSerializer,
+        "perfil": EmpregadorPerfilSerializer,
     }
     queryset = Empregador.objects.all()
     permission_classes = [
@@ -226,57 +218,10 @@ class EmpregadorViews(AbstractViewSet):
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers["default"])
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            user_data = {
-                "nome": serializer.validated_data.get("nome"),
-                "cpf": serializer.validated_data.get("cpf"),
-                "data_nascimento": serializer.validated_data.get("data_nascimento"),
-                "sexo": serializer.validated_data.get("sexo"),
-                "estado_civil": serializer.validated_data.get("estado_civil"),
-                "area_atuacao": serializer.validated_data.get("area_atuacao"),
-                "cargo": serializer.validated_data.get("cargo"),
-                "email": serializer.validated_data.get("email"),
-                "telefone": serializer.validated_data.get("telefone"),
-                "foto": serializer.validated_data.get("foto"),
-                "curriculo": serializer.validated_data.get("curriculo"),
-                "nivel_usuario": UsuarioNivelChoices.EMPREGADOR,
-            }
-
-            user = Empregador(**user_data)
-            user.save()
-
-            endereco_data = {
-                "cep": serializer.validated_data.get("cep"),
-                "logradouro": serializer.validated_data.get("logradouro"),
-                "numero": serializer.validated_data.get("numero"),
-                "complemento": serializer.validated_data.get("complemento"),
-                "bairro": serializer.validated_data.get("bairro"),
-                "cidade": serializer.validated_data.get("cidade"),
-                "estado": serializer.validated_data.get("estado"),
-            }
-
-            endereco = Endereco(**endereco_data)
-            endereco.save()
-
-            empresa_data = {
-                "razao_social": serializer.validated_data.get("razao_social"),
-                "cnpj": serializer.validated_data.get("cnpj"),
-                "nome_fantasia": serializer.validated_data.get("nome_fantasia"),
-                "ramo_atividade": serializer.validated_data.get("ramo_atividade"),
-                "numero_funcionarios": serializer.validated_data.get(
-                    "numero_funcionarios"
-                ),
-                "telefone": serializer.validated_data.get("telefone"),
-                "email": serializer.validated_data.get("email"),
-                "site": serializer.validated_data.get("site"),
-                "descricao": serializer.validated_data.get("descricao"),
-            }
-
-            empresa = Empresa(**empresa_data)
-            empresa.usuario = user
-            empresa.endereco = endereco
-            empresa.save()
+    @action(detail=False, methods=["GET"])
+    def perfil(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(request.user)
+        return Response(serializer.data)
 
 
 class CandidaturaViews(
@@ -319,12 +264,16 @@ class ObjetivoProfissionalViews(
             ]
         return super().get_permissions()
 
-    def update(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data["usuario"] = request.data.get("usuario", request.user.id)
-        request.data._mutable = False
+    def perform_update(self, serializer):
+        usuario = self.request.data.get("usuario")
 
-        return super().update(request, *args, **kwargs)
+        if isinstance(usuario, int):
+            usuario = Usuario.objects.get(id=usuario)
+
+        if not usuario:
+            usuario = self.request.user
+
+        serializer.save(usuario=usuario)
 
 
 class IdiomaViews(CandidatoPropertiesViewSet):
@@ -372,6 +321,28 @@ class VagaViews(AbstractViewSet):
         | (IsEmpregadorPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
+
+    def perform_update(self, serializer):
+        empresa = self.request.data.get("empresa")
+
+        if isinstance(empresa, int):
+            empresa = Empresa.objects.get(id=empresa)
+
+        if not empresa:
+            empresa = Empresa.objects.get(usuario=self.request.user)
+
+        serializer.save(empresa=empresa)
+
+    def perform_create(self, serializer):
+        empresa = self.request.data.get("empresa")
+
+        if isinstance(empresa, int):
+            empresa = Empresa.objects.get(id=empresa)
+
+        if not empresa:
+            empresa = Empresa.objects.get(usuario=self.request.user)
+
+        serializer.save(empresa=empresa)
 
 
 class AvaliacaoViews(AbstractViewSet):

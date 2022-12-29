@@ -8,7 +8,7 @@ app_name = 'emprega_api'
 
 router = DefaultRouter()
 
-router.register('user', UserViews, basename='user')
+router.register('usuario', UserViews, basename='user')
 router.register('candidato', CandidatoViews, basename='candidato')
 router.register('empregador', EmpregadorViews, basename='empregador')
 router.register('empresa', EmpresaViews, basename='empresa')

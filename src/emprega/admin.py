@@ -1,11 +1,11 @@
 from django.contrib import admin
 
 from emprega.models import Empresa, Candidatura, ObjetivoProfissional, Idioma, CursoEspecializacao, FormacaoAcademica, \
-    ExperienciaProfissional, Endereco, Vaga, Candidato, Empregador, User
+    ExperienciaProfissional, Endereco, Vaga, Candidato, Empregador, Usuario
 
 # Register your models here.
 
-admin.site.register(User)
+admin.site.register(Usuario)
 admin.site.register(Candidato)
 admin.site.register(Empregador)
 admin.site.register(Empresa)

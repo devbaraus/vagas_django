@@ -6,7 +6,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 
 from emprega.models import (
-    User,
+    Usuario,
     Empresa,
     Endereco,
     SexoChoices,
@@ -50,7 +50,7 @@ def generate_cnpj():
 
 class UserFactory(DjangoModelFactory):
     class Meta:
-        model = User
+        model = Usuario
 
     nome = factory.Faker("name")
     cpf = factory.lazy_attribute(lambda n: generate_cpf())
@@ -64,7 +64,7 @@ class UserFactory(DjangoModelFactory):
         lambda _: random.choice(TipoDeficienciaChoices.choices)[0]
     )
 
-    area_atuacao = factory.Faker("job")
+    atuacao = factory.Faker("job")
     cargo = factory.Faker("job")
 
     email = factory.Faker("email")

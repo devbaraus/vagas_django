@@ -4,14 +4,14 @@ from rest_framework.test import APITestCase, APIClient
 from emprega.factories import (
     UserFactory,
 )
-from emprega.models import UsuarioNivelChoices, User, Empregador
+from emprega.models import UsuarioNivelChoices, Usuario, Empregador
 
 
 class AdminUserTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.ADMIN)
         self.client = APIClient()
-        self.uri = "/user/"
+        self.uri = "/usuario/"
         self.create_status = None
         self.update_status = None
         self.retrieve_status = None
@@ -112,7 +112,7 @@ class AdminUserTestCase(APITestCase):
         if self.delete_status and self.delete_status != status.HTTP_204_NO_CONTENT:
             return
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(Usuario.objects.count(), 1)
 
     def test_self_detail(self):
         if not self.user:
@@ -179,7 +179,7 @@ class EmpregadorUserTestCase(AdminUserTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
         self.client = APIClient()
-        self.uri = "/user/"
+        self.uri = "/usuario/"
         self.create_status = 403
         self.update_status = 403
         self.retrieve_status = 403
@@ -196,7 +196,7 @@ class CandidatoUserTestCase(AdminUserTestCase):
     def setUp(self):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
-        self.uri = "/user/"
+        self.uri = "/usuario/"
         self.create_status = 403
         self.update_status = 403
         self.retrieve_status = 403
@@ -213,7 +213,7 @@ class GuestUserTestCase(AdminUserTestCase):
     def setUp(self):
         self.user = None
         self.client = APIClient()
-        self.uri = "/user/"
+        self.uri = "/usuario/"
         self.create_status = 401
         self.update_status = 401
         self.retrieve_status = 401
