@@ -138,3 +138,5 @@ GitHub.sublime-settings
 
 .env*
 !.env.example
+
+src/static
