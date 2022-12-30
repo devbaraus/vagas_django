@@ -297,7 +297,7 @@ class VagaSerializer(serializers.ModelSerializer):
 
 class VagaCreateSerializer(serializers.ModelSerializer):
     beneficios = serializers.ListSerializer(
-        "beneficios", child=serializers.IntegerField(), write_only=True
+        "beneficios", child=serializers.IntegerField(), write_only=True, required=False
     )
 
     class Meta:
@@ -311,7 +311,7 @@ class VagaCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            beneficios = validated_data.pop("beneficios")
+            beneficios = validated_data.pop("beneficios", [])
             vaga = Vaga.objects.create(**validated_data)
             for beneficio in beneficios:
                 vaga.beneficios.add(beneficio)
