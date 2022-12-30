@@ -283,7 +283,7 @@ class BeneficioSerializer(serializers.ModelSerializer):
 
 
 class VagaSerializer(serializers.ModelSerializer):
-    beneficios = BeneficioSerializer(many=True, read_only=True)
+    beneficios = BeneficioSerializer(many=True, read_only=True, required=False)
 
     class Meta:
         model = Vaga
