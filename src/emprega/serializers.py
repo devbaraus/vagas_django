@@ -311,7 +311,7 @@ class VagaCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            beneficios = validated_data.pop("beneficios")
+            beneficios = validated_data.pop("beneficios", [])
             vaga = Vaga.objects.create(**validated_data)
             for beneficio in beneficios:
                 vaga.beneficios.add(beneficio)
