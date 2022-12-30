@@ -199,6 +199,10 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
     def is_staff(self):
         return self.nivel_usuario <= UsuarioNivelChoices.ADMIN
 
+    @property
+    def empresa(self):
+        return Empresa.objects.filter(usuario=self).first()
+
     USERNAME_FIELD = "cpf"
     REQUIRED_FIELDS = ["nome", "email", "data_nascimento"]
 
@@ -371,6 +375,13 @@ class Empresa(AbstractBaseModel):
         return self.nome_fantasia
 
 
+class Beneficio(models.Model):
+    nome = models.CharField(verbose_name="Nome", max_length=255)
+
+    def __str__(self):
+        return self.nome
+
+
 class Vaga(AbstractBaseModel):
     cargo = models.CharField(verbose_name="Cargo", max_length=255)
     atividades = models.TextField(verbose_name="Atividades")
@@ -381,8 +392,8 @@ class Vaga(AbstractBaseModel):
     salario = models.DecimalField(
         verbose_name="Salário", max_digits=10, decimal_places=2
     )
-    jornada_trabalho = models.CharField(
-        verbose_name="Jornada de trabalho", max_length=255
+    jornada_trabalho = models.PositiveSmallIntegerField(
+        verbose_name="Jornada de trabalho", choices=JornadaTrabalhoChoices.choices
     )
     modelo_trabalho = models.PositiveSmallIntegerField(
         verbose_name="Modelo de trabalho", choices=ModeloTrabalhoChoices.choices
@@ -391,19 +402,15 @@ class Vaga(AbstractBaseModel):
         verbose_name="Regime contratual", choices=RegimeContratualChoices.choices
     )
     sexo = models.PositiveSmallIntegerField(
-        verbose_name="Sexo", null=True, blank=True, choices=SexoChoices.choices
+        verbose_name="Sexo", choices=SexoChoices.choices
     )
-    idade_minima = models.PositiveIntegerField(
-        verbose_name="Idade mínima", null=True, blank=True
-    )
-    idade_maxima = models.PositiveIntegerField(
-        verbose_name="Idade máxima", null=True, blank=True
-    )
+    idade_minima = models.PositiveIntegerField(verbose_name="Idade mínima", default=18)
+    idade_maxima = models.PositiveIntegerField(verbose_name="Idade máxima", default=65)
     quantidade_vagas = models.IntegerField(
-        verbose_name="Quantidade de vagas", null=True, blank=True
+        verbose_name="Quantidade de vagas", default=1
     )
     habilitado = models.BooleanField(verbose_name="Habilitado", default=True)
-    beneficios = models.TextField(verbose_name="Benefícios", null=True, blank=True)
+    beneficios = models.ManyToManyField(Beneficio, related_name="vaga_beneficios")
 
     empresa = models.ForeignKey(
         Empresa, on_delete=models.CASCADE, related_name="vagas_empresa"

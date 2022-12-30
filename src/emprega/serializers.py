@@ -18,6 +18,7 @@ from emprega.models import (
     RegimeContratualChoices,
     Avaliacao,
     UsuarioNivelChoices,
+    Beneficio,
 )
 
 
@@ -275,7 +276,15 @@ class EmpresaCreateSerializer(serializers.ModelSerializer):
         }
 
 
+class BeneficioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Beneficio
+        fields = "__all__"
+
+
 class VagaSerializer(serializers.ModelSerializer):
+    beneficios = BeneficioSerializer(many=True, read_only=True)
+
     class Meta:
         model = Vaga
         fields = "__all__"
@@ -284,6 +293,41 @@ class VagaSerializer(serializers.ModelSerializer):
                 "required": False,
             },
         }
+
+
+class VagaCreateSerializer(serializers.ModelSerializer):
+    beneficios = serializers.ListSerializer(
+        "beneficios", child=serializers.IntegerField(), write_only=True
+    )
+
+    class Meta:
+        model = Vaga
+        fields = "__all__"
+        extra_kwargs = {
+            "empresa": {
+                "required": False,
+            },
+        }
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            beneficios = validated_data.pop("beneficios")
+            vaga = Vaga.objects.create(**validated_data)
+            for beneficio in beneficios:
+                vaga.beneficios.add(beneficio)
+            return vaga
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            beneficios = validated_data.pop("beneficios")
+
+            instance = super().update(instance, validated_data)
+
+            instance.beneficios.clear()
+
+            for beneficio in beneficios:
+                instance.beneficios.add(beneficio)
+            return instance
 
 
 class AvaliacaoSerializer(serializers.ModelSerializer):

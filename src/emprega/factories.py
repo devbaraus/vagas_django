@@ -24,6 +24,7 @@ from emprega.models import (
     ExperienciaProfissional,
     CursoEspecializacao,
     Avaliacao,
+    Beneficio,
 )
 
 
@@ -151,6 +152,13 @@ class VagaFactory(DjangoModelFactory):
     quantidade_vagas = factory.Faker("random_int", min=1, max=10)
     beneficios = factory.Faker("text")
     empresa = factory.SubFactory(EmpresaFactory)
+
+
+class BeneficioFactory(DjangoModelFactory):
+    class Meta:
+        model = Beneficio
+
+    nome = factory.Faker("name")
 
 
 class CandidaturaFactory(DjangoModelFactory):

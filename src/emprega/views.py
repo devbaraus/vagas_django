@@ -1,6 +1,7 @@
-from django.db import transaction
+from django.db.models import Q
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -19,6 +20,7 @@ from emprega.models import (
     Usuario,
     UsuarioNivelChoices,
     Avaliacao,
+    Beneficio,
 )
 from emprega.permissions import (
     AdminPermission,
@@ -50,6 +52,8 @@ from emprega.serializers import (
     AvaliacaoSerializer,
     CandidatoPerfilSerializer,
     EmpregadorPerfilSerializer,
+    BeneficioSerializer,
+    VagaCreateSerializer,
 )
 
 
@@ -62,6 +66,30 @@ class AbstractViewSet(
     viewsets.GenericViewSet,
 ):
     permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission, OwnedByPermission]
+
+    def check_empresa(self, request):
+        empresa = request.data.get("empresa", request.user.empresa.id)
+        empresa = Empresa.objects.get(id=empresa)
+
+        if request.user.is_staff:
+            return empresa
+
+        if empresa.usuario != request.user:
+            raise PermissionDenied
+
+        return empresa
+
+    def check_usuario(self, request):
+        usuario = self.request.data.get("usuario", request.user.id)
+        usuario = Usuario.objects.get(id=usuario)
+
+        if request.user.is_staff:
+            return usuario
+
+        if usuario != request.user:
+            raise PermissionDenied
+
+        return usuario
 
 
 class CandidatoPropertiesViewSet(AbstractViewSet):
@@ -86,24 +114,12 @@ class CandidatoPropertiesViewSet(AbstractViewSet):
         return self.queryset
 
     def perform_update(self, serializer):
-        usuario = self.request.data.get("usuario")
-
-        if isinstance(usuario, int):
-            usuario = Candidato.objects.get(id=usuario)
-
-        if not usuario:
-            usuario = self.request.user
+        usuario = self.check_usuario(self.request)
 
         serializer.save(usuario=usuario)
 
     def perform_create(self, serializer):
-        usuario = self.request.data.get("usuario")
-
-        if isinstance(usuario, int):
-            usuario = Candidato.objects.get(id=usuario)
-
-        if not usuario:
-            usuario = self.request.user
+        usuario = self.check_usuario(self.request)
 
         serializer.save(usuario=usuario)
 
@@ -159,11 +175,9 @@ class EmpresaViews(AbstractViewSet):
         return self.serializers.get(self.action, self.serializers["default"])
 
     def create(self, request, *args, **kwargs):
-        # ADMIN CRIANDO EMPRESA
-        user = request.data.get("usuario", request.user.id)
-        user = Usuario.objects.get(id=user)
+        usuario = self.check_usuario(request)
 
-        if user.nivel_usuario != UsuarioNivelChoices.EMPREGADOR:
+        if usuario.nivel_usuario != UsuarioNivelChoices.EMPREGADOR:
             return Response(
                 {"detail": "Usuário deve ser um empregador para cadastrar uma empresa"},
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -242,10 +256,7 @@ class CandidaturaViews(
 
 
 class ObjetivoProfissionalViews(
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
+    AbstractViewSet,
 ):
     serializer_class = ObjetivoProfissionalSerializer
     queryset = ObjetivoProfissional.objects.all()
@@ -265,13 +276,12 @@ class ObjetivoProfissionalViews(
         return super().get_permissions()
 
     def perform_update(self, serializer):
-        usuario = self.request.data.get("usuario")
+        usuario = self.check_usuario(self.request)
 
-        if isinstance(usuario, int):
-            usuario = Usuario.objects.get(id=usuario)
+        serializer.save(usuario=usuario)
 
-        if not usuario:
-            usuario = self.request.user
+    def perform_create(self, serializer):
+        usuario = self.check_usuario(self.request)
 
         serializer.save(usuario=usuario)
 
@@ -312,37 +322,81 @@ class EnderecoViews(
     ]
 
 
+class BeneficioViews(AbstractViewSet):
+    serializer_class = BeneficioSerializer
+    queryset = Beneficio.objects.all()
+    permission_classes = [IsAuthenticated, AdminPermission | ReadOnlyPermission]
+
+
 class VagaViews(AbstractViewSet):
-    serializer_class = VagaSerializer
+    serializers = {
+        "default": VagaSerializer,
+        "create": VagaCreateSerializer,
+    }
+
     queryset = Vaga.objects.all()
     permission_classes = [
-        IsAuthenticatedOrReadOnly,
         AdminPermission
         | (IsEmpregadorPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
 
+    def list(self, request, *args, **kwargs):
+        termo = request.query_params.get("termo")
+        empresa = request.query_params.get("empresa")
+        salario = request.query_params.get("salario")
+        modelo_trabalho = request.query_params.get("modelo_trabalho")
+        jornada_trabalho = request.query_params.get("jornada_trabalho")
+        regime_contratual = request.query_params.get("regime_contratual")
+
+        filtering = Q()
+
+        if termo:
+            filtering &= (
+                Q(cargo__icontains=termo)
+                | Q(atividades__icontains=termo)
+                | Q(requisitos__icontains=termo)
+            )
+
+        if empresa:
+            filtering &= Q(empresa__nome_fantasia=empresa) | Q(
+                empresa__razao_social=empresa
+            )
+
+        if salario:
+            filtering &= Q(salario__gte=salario)
+
+        if modelo_trabalho:
+            filtering &= Q(modelo_trabalho=modelo_trabalho)
+
+        if jornada_trabalho:
+            filtering &= Q(jornada_trabalho=jornada_trabalho)
+
+        if regime_contratual:
+            filtering &= Q(regime_contratual=regime_contratual)
+
+        queryset = self.filter_queryset(self.get_queryset().filter(filtering))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers["default"])
+
     def perform_update(self, serializer):
-        empresa = self.request.data.get("empresa")
-
-        if isinstance(empresa, int):
-            empresa = Empresa.objects.get(id=empresa)
-
-        if not empresa:
-            empresa = Empresa.objects.get(usuario=self.request.user)
+        empresa = self.check_empresa(self.request)
 
         serializer.save(empresa=empresa)
 
     def perform_create(self, serializer):
-        empresa = self.request.data.get("empresa")
-
-        if isinstance(empresa, int):
-            empresa = Empresa.objects.get(id=empresa)
-
-        if not empresa:
-            empresa = Empresa.objects.get(usuario=self.request.user)
+        empresa = self.check_empresa(self.request)
 
         serializer.save(empresa=empresa)
+
+    @action(detail=True, methods=["GET"])
+    def candidatos(self, request, *args, **kwargs):
+        vaga = self.get_object()
+        serializer = CandidatoSerializer(vaga.candidatos.all(), many=True)
+        return Response(serializer.data)
 
 
 class AvaliacaoViews(AbstractViewSet):
