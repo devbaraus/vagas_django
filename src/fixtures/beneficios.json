@@ -1,0 +1,142 @@
+[
+  {
+    "model": "emprega.beneficio",
+    "pk": 1,
+    "fields": {
+      "nome": "Previdência Privada"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 2,
+    "fields": {
+      "nome": "Seguro Saúde"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 3,
+    "fields": {
+      "nome": "Seguro de Vida"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 4,
+    "fields": {
+      "nome": "Plano Odontológico"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 5,
+    "fields": {
+      "nome": "Convênio com Farmácia"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 6,
+    "fields": {
+      "nome": "Tíquete Refeição"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 7,
+    "fields": {
+      "nome": "Tíquete Alimentação"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 8,
+    "fields": {
+      "nome": "Cesta Básica"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 9,
+    "fields": {
+      "nome": "Restaurante na empresa"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 10,
+    "fields": {
+      "nome": "Combustível"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 11,
+    "fields": {
+      "nome": "Estacionamento"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 12,
+    "fields": {
+      "nome": "Vale Transporte"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 13,
+    "fields": {
+      "nome": "Carro fornecido pela empresa"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 14,
+    "fields": {
+      "nome": "Celular fornecido pela empresa"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 15,
+    "fields": {
+      "nome": "Transporte fornecido pela empresa"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 16,
+    "fields": {
+      "nome": "Auxílio Creche"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 17,
+    "fields": {
+      "nome": "Estudo de Idiomas"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 18,
+    "fields": {
+      "nome": "Estudo de Pós-Graduação/MBA"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 19,
+    "fields": {
+      "nome": "Estudo de Graduação"
+    }
+  },
+  {
+    "model": "emprega.beneficio",
+    "pk": 20,
+    "fields": {
+      "nome": "Participação nos Lucros"
+    }
+  }
+]

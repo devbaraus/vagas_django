@@ -109,7 +109,7 @@ class CandidatoPropertiesViewSet(AbstractViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        if self.action == "retrieve" and not self.request.user.is_staff:
+        if self.action in ["retrieve", "list"] and not self.request.user.is_staff:
             return self.queryset.filter(usuario=self.request.user)
         return self.queryset
 
@@ -253,6 +253,13 @@ class CandidaturaViews(
         | (IsCandidatoPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
+
+    def get_queryset(self):
+        if self.action in ["retrieve", "list"] and self.request.user.is_candidato:
+            return self.queryset.filter(usuario=self.request.user)
+        if self.action in ["retrieve", "list"] and self.request.user.is_empregador:
+            return self.queryset.filter(usuario=self.request.user.empresa)
+        return self.queryset
 
 
 class ObjetivoProfissionalViews(

@@ -203,6 +203,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
     def empresa(self):
         return Empresa.objects.filter(usuario=self).first()
 
+    @property
+    def is_candidato(self):
+        return self.nivel_usuario == UsuarioNivelChoices.CANDIDATO
+
+    @property
+    def is_empregador(self):
+        return self.nivel_usuario == UsuarioNivelChoices.EMPREGADOR
+
     USERNAME_FIELD = "cpf"
     REQUIRED_FIELDS = ["nome", "email", "data_nascimento"]
 
