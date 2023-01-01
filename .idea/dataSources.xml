@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/empregaanapolis</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="vagasanapolis@129.148.60.91" uuid="0a78f6d5-e97f-4db8-9623-483f3189434a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://129.148.60.91:5432/vagasanapolis</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

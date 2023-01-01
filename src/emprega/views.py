@@ -217,27 +217,6 @@ class EmpresaViews(AbstractViewSet):
         empresa.save()
 
 
-class EmpregadorViews(AbstractViewSet):
-    serializers = {
-        "default": EmpregadorSerializer,
-        "create": EmpregadorCreateSerializer,
-        "list": EmpregadorListSerializer,
-        "perfil": EmpregadorPerfilSerializer,
-    }
-    queryset = Empregador.objects.all()
-    permission_classes = [
-        CreatePermission | AdminPermission | OwnedByPermission,
-    ]
-
-    def get_serializer_class(self):
-        return self.serializers.get(self.action, self.serializers["default"])
-
-    @action(detail=False, methods=["GET"])
-    def perfil(self, request, *args, **kwargs):
-        serializer = self.get_serializer_class()(request.user)
-        return Response(serializer.data)
-
-
 class CandidaturaViews(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
@@ -349,6 +328,7 @@ class VagaViews(AbstractViewSet):
     ]
 
     def list(self, request, *args, **kwargs):
+        selecionado = request.query_params.get("selecionado")
         termo = request.query_params.get("termo")
         empresa = request.query_params.get("empresa")
         salario = request.query_params.get("salario")
@@ -366,8 +346,8 @@ class VagaViews(AbstractViewSet):
             )
 
         if empresa:
-            filtering &= Q(empresa__nome_fantasia=empresa) | Q(
-                empresa__razao_social=empresa
+            filtering &= Q(empresa__nome_fantasia__icontains=empresa) | Q(
+                empresa__razao_social__icontains=empresa
             )
 
         if salario:
@@ -382,7 +362,18 @@ class VagaViews(AbstractViewSet):
         if regime_contratual:
             filtering &= Q(regime_contratual=regime_contratual)
 
-        queryset = self.filter_queryset(self.get_queryset().filter(filtering))
+        selected_vaga = None
+
+        if selecionado:
+            selected_vaga = Vaga.objects.get(id=selecionado)
+            filtering = filtering & ~Q(id=selecionado)
+
+        queryset = self.get_queryset().filter(filtering)
+
+        if selected_vaga:
+            queryset = [selected_vaga] + list(queryset)
+
+        queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -421,3 +412,31 @@ class AvaliacaoViews(AbstractViewSet):
         | (IsCandidatoPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
+
+
+class EmpregadorViews(AbstractViewSet):
+    serializers = {
+        "default": EmpregadorSerializer,
+        "create": EmpregadorCreateSerializer,
+        "list": EmpregadorListSerializer,
+        "perfil": EmpregadorPerfilSerializer,
+    }
+    queryset = Empregador.objects.all()
+    permission_classes = [
+        CreatePermission | AdminPermission | OwnedByPermission,
+    ]
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers["default"])
+
+    @action(detail=False, methods=["GET"])
+    def perfil(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(request.user)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["GET"])
+    def vagas(self, request, *args, **kwargs):
+        vagas = self.get_object().vagas.all()
+
+        serializer = VagaSerializer(vagas, many=True)
+        return Response(serializer.data)

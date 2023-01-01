@@ -1,3 +1,4 @@
+from auditlog.models import LogEntry
 from django.db import transaction
 from rest_framework import serializers
 
@@ -285,17 +286,19 @@ class BeneficioSerializer(serializers.ModelSerializer):
 class EmpresaVagaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
-        fields = [
-            "id",
-            "nome_fantasia",
-            "razao_social",
-            "cnpj"
-        ]
+        fields = ["id", "nome_fantasia", "razao_social", "cnpj"]
+
+
+class VagaHistoricoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogEntry
+        fields = "__all__"
 
 
 class VagaSerializer(serializers.ModelSerializer):
     beneficios = BeneficioSerializer(many=True, read_only=True)
     empresa = EmpresaVagaSerializer(read_only=True)
+    history = serializers.SerializerMethodField()
 
     class Meta:
         model = Vaga
@@ -305,6 +308,9 @@ class VagaSerializer(serializers.ModelSerializer):
                 "required": False,
             },
         }
+
+    def get_history(self, obj):
+        return VagaHistoricoSerializer(obj.history.all(), many=True).data
 
 
 class VagaCreateSerializer(serializers.ModelSerializer):

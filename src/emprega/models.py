@@ -1,3 +1,4 @@
+from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -229,15 +230,6 @@ class Candidato(Usuario):
         verbose_name_plural = "Candidatos"
 
 
-class Empregador(Usuario):
-    objects = EmpregadorManager()
-
-    class Meta:
-        proxy = True
-        verbose_name = "Empregador"
-        verbose_name_plural = "Empregadores"
-
-
 class ObjetivoProfissional(AbstractBaseModel):
     cargo = models.CharField(verbose_name="Cargo", max_length=255)
     salario = models.DecimalField(
@@ -424,6 +416,8 @@ class Vaga(AbstractBaseModel):
         Empresa, on_delete=models.CASCADE, related_name="vagas_empresa"
     )
 
+    history = AuditlogHistoryField()
+
     def __str__(self):
         return self.cargo
 
@@ -456,6 +450,19 @@ class Avaliacao(AbstractBaseModel):
 
     def __str__(self):
         return self.vaga.cargo + " - " + self.usuario.cpf
+
+
+class Empregador(Usuario):
+    objects = EmpregadorManager()
+
+    @property
+    def vagas(self):
+        return Vaga.objects.filter(empresa__usuario=self)
+
+    class Meta:
+        proxy = True
+        verbose_name = "Empregador"
+        verbose_name_plural = "Empregadores"
 
 
 auditlog.register(Usuario)
