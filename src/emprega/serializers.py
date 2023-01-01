@@ -282,8 +282,20 @@ class BeneficioSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class EmpresaVagaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empresa
+        fields = [
+            "id",
+            "nome_fantasia",
+            "razao_social",
+            "cnpj"
+        ]
+
+
 class VagaSerializer(serializers.ModelSerializer):
     beneficios = BeneficioSerializer(many=True, read_only=True)
+    empresa = EmpresaVagaSerializer(read_only=True)
 
     class Meta:
         model = Vaga
