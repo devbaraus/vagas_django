@@ -33,6 +33,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 
 class EmpregadorSerializer(UsuarioSerializer):
+    empresa = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Empregador
         fields = "__all__"
@@ -337,12 +339,9 @@ class VagaCreateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            beneficios = validated_data.pop("beneficios")
-
+            beneficios = validated_data.pop("beneficios", [])
             instance = super().update(instance, validated_data)
-
             instance.beneficios.clear()
-
             for beneficio in beneficios:
                 instance.beneficios.add(beneficio)
             return instance

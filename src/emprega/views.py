@@ -318,6 +318,7 @@ class VagaViews(AbstractViewSet):
     serializers = {
         "default": VagaSerializer,
         "create": VagaCreateSerializer,
+        "update": VagaCreateSerializer,
     }
 
     queryset = Vaga.objects.all()
@@ -326,6 +327,12 @@ class VagaViews(AbstractViewSet):
         | (IsEmpregadorPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
+
+    @action(detail=False, methods=["get"], url_path="empresa/(?P<empresa_id>[^/.]+)")
+    def empresa(self, request, empresa_id, *args, **kwargs):
+        empresa = Empresa.objects.get(id=empresa_id)
+
+        return self.list(request, empresa_obj=empresa, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         selecionado = request.query_params.get("selecionado")
@@ -345,10 +352,13 @@ class VagaViews(AbstractViewSet):
                 | Q(requisitos__icontains=termo)
             )
 
-        if empresa:
+        if empresa and not kwargs.get("empresa_obj"):
             filtering &= Q(empresa__nome_fantasia__icontains=empresa) | Q(
                 empresa__razao_social__icontains=empresa
             )
+
+        if kwargs.get("empresa_obj"):
+            filtering &= Q(empresa=kwargs.get("empresa_obj"))
 
         if salario:
             filtering &= Q(salario__gte=salario)
@@ -435,8 +445,7 @@ class EmpregadorViews(AbstractViewSet):
         return Response(serializer.data)
 
     @action(detail=True, methods=["GET"])
-    def vagas(self, request, *args, **kwargs):
-        vagas = self.get_object().vagas.all()
-
-        serializer = VagaSerializer(vagas, many=True)
+    def empresa(self, request, *args, **kwargs):
+        empregador = self.get_object()
+        serializer = EmpresaSerializer(empregador.empresa)
         return Response(serializer.data)
