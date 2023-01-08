@@ -139,6 +139,7 @@ class CandidatoEnderecoTestCase(AdminEnderecoTestCase):
     def test_retrieve(self):
         super().test_retrieve()
 
+
 class GuestEnderecoTestCase(AdminEnderecoTestCase):
     def setUp(self):
         self.user = None

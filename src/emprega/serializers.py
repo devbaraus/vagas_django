@@ -1,5 +1,6 @@
 from auditlog.models import LogEntry
 from django.db import transaction
+from drf_recaptcha.fields import ReCaptchaV2Field
 from rest_framework import serializers
 
 from emprega.models import (
@@ -23,7 +24,12 @@ from emprega.models import (
 )
 
 
-class UsuarioSerializer(serializers.ModelSerializer):
+class AbstractReCaptchaSerializer(serializers.ModelSerializer):
+    recaptcha = ReCaptchaV2Field(write_only=True)
+
+
+class UsuarioSerializer(AbstractReCaptchaSerializer):
+    recaptcha = ReCaptchaV2Field()
     empresas = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
@@ -50,6 +56,8 @@ class EmpregadorSerializer(UsuarioSerializer):
 
 
 class EmpregadorCreateSerializer(UsuarioSerializer):
+    recaptcha = ReCaptchaV2Field()
+
     # EMPRESA
     cnpj = serializers.CharField(
         max_length=14, min_length=14, required=True, write_only=True
@@ -94,6 +102,7 @@ class EmpregadorCreateSerializer(UsuarioSerializer):
             "habilitado": {"read_only": True},
             "foto": {"read_only": True},
             "tipo_deficiencia": {"read_only": True},
+            "password": {"write_only": True},
         }
 
     def create(self, validated_data):
@@ -181,6 +190,8 @@ class CandidatoListSerializer(UsuarioSerializer):
 
 
 class CandidatoCreateSerializer(UsuarioSerializer):
+    recaptcha = ReCaptchaV2Field()
+
     # OBJETIVO PROFISSIONAL
     cargo = serializers.CharField(max_length=255, required=False)
     salario = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
@@ -196,6 +207,7 @@ class CandidatoCreateSerializer(UsuarioSerializer):
         model = Candidato
         fields = "__all__"
         extra_kwargs = {
+            "password": {"write_only": True},
             "last_login": {"read_only": True},
             "is_superuser": {"read_only": True},
             "nivel_usuario": {"read_only": True},
@@ -246,19 +258,19 @@ class CandidatoCreateSerializer(UsuarioSerializer):
             return user
 
 
-class EmpresaSerializer(serializers.ModelSerializer):
+class EmpresaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Empresa
         fields = "__all__"
 
 
-class EnderecoSerializer(serializers.ModelSerializer):
+class EnderecoSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Endereco
         fields = "__all__"
 
 
-class EmpresaCreateSerializer(serializers.ModelSerializer):
+class EmpresaCreateSerializer(AbstractReCaptchaSerializer):
     cep = serializers.CharField(
         max_length=8, min_length=8, required=False, write_only=True
     )
@@ -279,19 +291,19 @@ class EmpresaCreateSerializer(serializers.ModelSerializer):
         }
 
 
-class BeneficioSerializer(serializers.ModelSerializer):
+class BeneficioSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Beneficio
         fields = "__all__"
 
 
-class EmpresaVagaSerializer(serializers.ModelSerializer):
+class EmpresaVagaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Empresa
         fields = ["id", "nome_fantasia", "razao_social", "cnpj"]
 
 
-class VagaHistoricoSerializer(serializers.ModelSerializer):
+class LogEntrySerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = LogEntry
         fields = "__all__"
@@ -312,10 +324,10 @@ class VagaSerializer(serializers.ModelSerializer):
         }
 
     def get_history(self, obj):
-        return VagaHistoricoSerializer(obj.history.all(), many=True).data
+        return LogEntrySerializer(obj.history.all(), many=True).data
 
 
-class VagaCreateSerializer(serializers.ModelSerializer):
+class VagaCreateSerializer(AbstractReCaptchaSerializer):
     beneficios = serializers.ListSerializer(
         "beneficios", child=serializers.IntegerField(), write_only=True, required=False
     )
@@ -347,13 +359,13 @@ class VagaCreateSerializer(serializers.ModelSerializer):
             return instance
 
 
-class AvaliacaoSerializer(serializers.ModelSerializer):
+class AvaliacaoSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Avaliacao
         fields = "__all__"
 
 
-class ObjetivoProfissionalSerializer(serializers.ModelSerializer):
+class ObjetivoProfissionalSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = ObjetivoProfissional
         fields = "__all__"
@@ -362,7 +374,7 @@ class ObjetivoProfissionalSerializer(serializers.ModelSerializer):
         }
 
 
-class FormacaoAcademicaSerializer(serializers.ModelSerializer):
+class FormacaoAcademicaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = FormacaoAcademica
         fields = "__all__"
@@ -371,7 +383,7 @@ class FormacaoAcademicaSerializer(serializers.ModelSerializer):
         }
 
 
-class ExperienciaProfissionalSerializer(serializers.ModelSerializer):
+class ExperienciaProfissionalSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = ExperienciaProfissional
         fields = "__all__"
@@ -380,7 +392,7 @@ class ExperienciaProfissionalSerializer(serializers.ModelSerializer):
         }
 
 
-class IdiomaSerializer(serializers.ModelSerializer):
+class IdiomaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Idioma
         fields = "__all__"
@@ -389,7 +401,7 @@ class IdiomaSerializer(serializers.ModelSerializer):
         }
 
 
-class CursoEspecializacaoSerializer(serializers.ModelSerializer):
+class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = CursoEspecializacao
         fields = "__all__"

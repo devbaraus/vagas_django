@@ -56,6 +56,7 @@ class AdminEmpregadorTestCase(APITestCase):
             "cargo": user.cargo,
             "email": user.email,
             "telefone": user.telefone,
+            "recaptcha": "blablabla"
         }
 
         response = self.client.post(self.uri, data=data)

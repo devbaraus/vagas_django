@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_recaptcha",
     "auditlog",
     "rest_framework",
     "django_filters",
@@ -153,8 +154,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -177,8 +178,8 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
         # 'rest_framework.permissions.IsAuthenticated'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 20
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 20,
 }
 
 REST_KNOX = {
@@ -188,19 +189,19 @@ REST_KNOX = {
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN", None),
     integrations=[DjangoIntegration()],
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
     traces_sample_rate=1.0,
-
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
-
     # By default the SDK will try to use the SENTRY_RELEASE
     # environment variable, or infer a git commit
     # SHA as release, however you may want to set
     # something more human-readable.
     # release="myapp@1.0.0",
 )
+
+# RECAPTCHA
+DRF_RECAPTCHA_SECRET_KEY = os.getenv("DRF_RECAPTCHA_SECRET_KEY", None)

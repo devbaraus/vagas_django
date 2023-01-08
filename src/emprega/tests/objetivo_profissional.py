@@ -82,7 +82,9 @@ class AdminObjetivoProfissionalTestCase(APITestCase):
         self.assertEqual(json_response["cargo"], item_stub.cargo)
         self.assertEqual(json_response["salario"], str(item_stub.salario))
         self.assertEqual(json_response["modelo_trabalho"], item_stub.modelo_trabalho)
-        self.assertEqual(json_response["regime_contratual"], item_stub.regime_contratual)
+        self.assertEqual(
+            json_response["regime_contratual"], item_stub.regime_contratual
+        )
         self.assertEqual(json_response["jornada_trabalho"], item_stub.jornada_trabalho)
         self.assertEqual(json_response["usuario"], self.user.id)
 

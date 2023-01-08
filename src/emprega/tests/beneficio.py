@@ -3,10 +3,9 @@ from rest_framework.test import APITestCase, APIClient
 
 from emprega.factories import (
     UserFactory,
-    ObjetivoProfissionalFactory,
     BeneficioFactory,
 )
-from emprega.models import UsuarioNivelChoices, Candidato, Beneficio
+from emprega.models import UsuarioNivelChoices, Beneficio
 
 
 class AdminBeneficioTestCase(APITestCase):
