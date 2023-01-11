@@ -1,3 +1,5 @@
+import os
+
 from auditlog.models import LogEntry
 from django.db import transaction
 from drf_recaptcha.fields import ReCaptchaV2Field
@@ -27,14 +29,20 @@ from emprega.models import (
 class AbstractReCaptchaSerializer(serializers.ModelSerializer):
     recaptcha = ReCaptchaV2Field(write_only=True)
 
+    # pass
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha")
+        return super().create(validated_data)
+
 
 class UsuarioSerializer(AbstractReCaptchaSerializer):
-    recaptcha = ReCaptchaV2Field()
+    foto = serializers.ImageField(required=False, allow_empty_file=True)
     empresas = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Usuario
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {"password": {"write_only": True}}
 
 
@@ -43,7 +51,7 @@ class EmpregadorSerializer(UsuarioSerializer):
 
     class Meta:
         model = Empregador
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {
             "password": {"write_only": True, "required": False},
             "is_superuser": {"read_only": True},
@@ -56,8 +64,6 @@ class EmpregadorSerializer(UsuarioSerializer):
 
 
 class EmpregadorCreateSerializer(UsuarioSerializer):
-    recaptcha = ReCaptchaV2Field()
-
     # EMPRESA
     cnpj = serializers.CharField(
         max_length=14, min_length=14, required=True, write_only=True
@@ -92,15 +98,12 @@ class EmpregadorCreateSerializer(UsuarioSerializer):
 
     class Meta:
         model = Empregador
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {
             "last_login": {"read_only": True},
             "is_superuser": {"read_only": True},
             "nivel_usuario": {"read_only": True},
-            "groups": {"read_only": True},
-            "user_permissions": {"read_only": True},
             "habilitado": {"read_only": True},
-            "foto": {"read_only": True},
             "tipo_deficiencia": {"read_only": True},
             "password": {"write_only": True},
         }
@@ -166,9 +169,11 @@ class EmpregadorListSerializer(UsuarioSerializer):
 
 
 class CandidatoSerializer(UsuarioSerializer):
+    foto = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Candidato
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {
             "password": {
                 "write_only": True,
@@ -180,6 +185,14 @@ class CandidatoSerializer(UsuarioSerializer):
     def update(self, instance, validated_data):
         if "password" in validated_data:
             instance.set_password(validated_data["password"])
+        if "curriculo" in validated_data:
+            if instance.curriculo and os.path.isfile(instance.curriculo.path):
+                os.remove(instance.curriculo.path)
+            instance.curriculo = validated_data["curriculo"]
+        if "foto" in validated_data:
+            if instance.foto and os.path.isfile(instance.foto.path):
+                os.remove(instance.foto.path)
+            instance.foto = validated_data
         return super().update(instance, validated_data)
 
 
@@ -190,8 +203,6 @@ class CandidatoListSerializer(UsuarioSerializer):
 
 
 class CandidatoCreateSerializer(UsuarioSerializer):
-    recaptcha = ReCaptchaV2Field()
-
     # OBJETIVO PROFISSIONAL
     cargo = serializers.CharField(max_length=255, required=False)
     salario = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
@@ -205,7 +216,7 @@ class CandidatoCreateSerializer(UsuarioSerializer):
 
     class Meta:
         model = Candidato
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {
             "password": {"write_only": True},
             "last_login": {"read_only": True},
@@ -214,7 +225,6 @@ class CandidatoCreateSerializer(UsuarioSerializer):
             "groups": {"read_only": True},
             "user_permissions": {"read_only": True},
             "habilitado": {"read_only": True},
-            "foto": {"read_only": True},
             "atuacao": {"read_only": True},
             "cargo": {"write_only": True},
             "salario": {"write_only": True},
@@ -234,8 +244,8 @@ class CandidatoCreateSerializer(UsuarioSerializer):
                 "tipo_deficiencia": validated_data.get("tipo_deficiencia"),
                 "email": validated_data.get("email"),
                 "telefone": validated_data.get("telefone"),
-                # 'foto': validated_data.get('foto'),
-                # 'curriculo': validated_data.get('curriculo'),
+                "foto": validated_data.get("foto"),
+                "curriculo": validated_data.get("curriculo"),
                 "nivel_usuario": UsuarioNivelChoices.CANDIDATO,
             }
 
@@ -259,9 +269,18 @@ class CandidatoCreateSerializer(UsuarioSerializer):
 
 
 class EmpresaSerializer(AbstractReCaptchaSerializer):
+    foto = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = Empresa
         fields = "__all__"
+
+    def update(self, instance, validated_data):
+        if "foto" in validated_data:
+            if instance.foto and os.path.isfile(instance.foto.path):
+                os.remove(instance.foto.path)
+            instance.foto = validated_data["foto"]
+        return super().update(instance, validated_data)
 
 
 class EnderecoSerializer(AbstractReCaptchaSerializer):
@@ -409,6 +428,12 @@ class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
             "usuario": {"required": False},
         }
 
+    def update(self, instance, validated_data):
+        if "certificado" in validated_data:
+            if instance.certificado and os.path.isfile(instance.certificado.path):
+                os.remove(instance.certificado.path)
+            instance.certificado = validated_data["certificado"]
+
 
 class CandidaturaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -425,7 +450,7 @@ class CandidatoPerfilSerializer(UsuarioSerializer):
 
     class Meta:
         model = Candidato
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def get_objetivo_profissional(self, obj):
@@ -455,7 +480,7 @@ class EmpregadorPerfilSerializer(UsuarioSerializer):
 
     class Meta:
         model = Empregador
-        fields = "__all__"
+        exclude = ["groups", "user_permissions"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def get_empresa(self, obj):
