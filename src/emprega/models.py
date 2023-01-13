@@ -194,7 +194,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
         verbose_name="Currículo", upload_to="curriculos", null=True, blank=True
     )
 
-    habilitado = models.BooleanField(verbose_name="habilitado", default=True)
+    esta_ativo = models.BooleanField(verbose_name="esta_ativo", default=True)
+    esta_verificado = models.BooleanField(verbose_name="esta_verificado", default=False)
 
     @property
     def is_staff(self):
@@ -409,7 +410,7 @@ class Vaga(AbstractBaseModel):
     quantidade_vagas = models.IntegerField(
         verbose_name="Quantidade de vagas", default=1
     )
-    habilitado = models.BooleanField(verbose_name="Habilitado", default=True)
+    esta_ativo = models.BooleanField(verbose_name="Está ativo", default=True)
     beneficios = models.ManyToManyField(Beneficio, related_name="vaga_beneficios")
 
     empresa = models.ForeignKey(
@@ -429,6 +430,7 @@ class Candidatura(AbstractBaseModel):
     usuario = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name="candidaturas_usuario"
     )
+    esta_ativo = models.BooleanField(verbose_name="Está ativo", default=True)
 
     class Meta:
         unique_together = ("vaga", "usuario")

@@ -1,7 +1,8 @@
 from django.db.models import Q
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -157,6 +158,52 @@ class CandidatoViews(AbstractViewSet):
         serializer = self.get_serializer_class()(request.user)
         return Response(serializer.data)
 
+    def list(self, request, *args, **kwargs):
+        selecionado = request.query_params.get("selecionado")
+        termo = request.query_params.get("formacao_academica")
+        salario = request.query_params.get("salario")
+        modelo_trabalho = request.query_params.get("modelo_trabalho")
+        jornada_trabalho = request.query_params.get("jornada_trabalho")
+        regime_contratual = request.query_params.get("regime_contratual")
+
+        filtering = Q()
+
+        if termo:
+            filtering &= Q(objetivo_profissional_usuario__cargo__icontains=termo)
+
+        if salario:
+            filtering &= Q(objetivo_profissional_usuario__salario__gte=salario)
+
+        if modelo_trabalho:
+            filtering &= Q(objetivo_profissional_usuario__modelo_trabalho=modelo_trabalho)
+
+        if jornada_trabalho:
+            filtering &= Q(objetivo_profissional_usuario__jornada_trabalho=jornada_trabalho)
+
+        if regime_contratual:
+            filtering &= Q(objetivo_profissional_usuario__regime_contratual=regime_contratual)
+
+        selected_vaga = None
+
+        if selecionado:
+            selected_vaga = Candidato.objects.get(id=selecionado)
+            filtering = filtering & ~Q(id=selecionado)
+
+        queryset = Candidato.objects.filter(filtering)
+
+        if selected_vaga:
+            queryset = [selected_vaga] + list(queryset)
+
+        queryset = self.filter_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class EmpresaViews(AbstractViewSet):
     serializers = {
@@ -220,7 +267,6 @@ class EmpresaViews(AbstractViewSet):
 class CandidaturaViews(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -239,6 +285,45 @@ class CandidaturaViews(
         if self.action in ["retrieve", "list"] and self.request.user.is_empregador:
             return self.queryset.filter(usuario=self.request.user.empresa)
         return self.queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+            else:
+                instance = get_object_or_404(
+                    Candidatura,
+                    vaga_id=request.data.get("vaga"),
+                    usuario=request.data.get("usuario"),
+                )
+                instance.esta_ativo = True
+                instance.save()
+                serializer = self.get_serializer(instance)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def list(self, request, *args, **kwargs):
+        ativo = request.query_params.get("esta_ativo", True)
+        queryset = self.filter_queryset(self.get_queryset().filter(esta_ativo=ativo))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        candidatura = self.get_object()
+        candidatura.esta_ativo = False
+        candidatura.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ObjetivoProfissionalViews(
@@ -328,11 +413,37 @@ class VagaViews(AbstractViewSet):
         | ReadOnlyPermission,
     ]
 
+    @action(
+        detail=False, methods=["get"], url_path="candidaturas/(?P<candidato_id>[^/.]+)"
+    )
+    def candidaturas(self, request, candidato_id, *args, **kwargs):
+        ativo = request.query_params.get("esta_ativo", True)
+
+        candidato = get_object_or_404(Candidato, pk=candidato_id)
+        queryset = self.get_queryset().filter(
+            candidaturas_vaga__usuario=candidato, candidaturas_vaga__esta_ativo=ativo
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=["get"], url_path="empresa/(?P<empresa_id>[^/.]+)")
     def empresa(self, request, empresa_id, *args, **kwargs):
-        empresa = Empresa.objects.get(id=empresa_id)
+        empresa = get_object_or_404(Empresa, pk=empresa_id)
+        queryset = self.get_queryset().filter(empresa=empresa)
 
-        return self.list(request, empresa_obj=empresa, *args, **kwargs)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         selecionado = request.query_params.get("selecionado")
@@ -347,18 +458,15 @@ class VagaViews(AbstractViewSet):
 
         if termo:
             filtering &= (
-                Q(cargo__icontains=termo)
-                | Q(atividades__icontains=termo)
-                | Q(requisitos__icontains=termo)
+                    Q(cargo__icontains=termo)
+                    | Q(atividades__icontains=termo)
+                    | Q(requisitos__icontains=termo)
             )
 
-        if empresa and not kwargs.get("empresa_obj"):
+        if empresa:
             filtering &= Q(empresa__nome_fantasia__icontains=empresa) | Q(
                 empresa__razao_social__icontains=empresa
             )
-
-        if kwargs.get("empresa_obj"):
-            filtering &= Q(empresa=kwargs.get("empresa_obj"))
 
         if salario:
             filtering &= Q(salario__gte=salario)

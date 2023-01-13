@@ -197,9 +197,15 @@ class CandidatoSerializer(UsuarioSerializer):
 
 
 class CandidatoListSerializer(UsuarioSerializer):
+    objetivo_profissional = serializers.SerializerMethodField()
+
     class Meta:
         model = Candidato
-        fields = ["id", "nome"]
+        fields = ["id", "nome", "objetivo_profissional"]
+
+    def get_objetivo_profissional(self, obj):
+        item = ObjetivoProfissional.objects.filter(usuario=obj).first()
+        return ObjetivoProfissionalSerializer(item).data
 
 
 class CandidatoCreateSerializer(UsuarioSerializer):
