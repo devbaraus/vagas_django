@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "knox",
     "corsheaders",
     "emprega",
+    "recomendacao",
 ]
 
 MIDDLEWARE = [
