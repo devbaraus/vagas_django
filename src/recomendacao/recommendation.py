@@ -12,15 +12,16 @@ from emprega.models import (
     Usuario,
 )
 
-def recommend(query, user):
+def recommend_vagas(vagas, user):
     pdf_path = user.curriculo
-
+     
     ## can be done before
     start = time.time()
     pdf_text = get_pdf_text(pdf_path)
-    vagas_text = get_vagas_text(query)
+    vagas_text = []
+    for vaga in vagas:
+        vagas_text.append(get_vaga_text(vaga))
     print(f'getting text = {time.time() - start}')
-
 
     ## can be done before
     start = time.time()
@@ -33,13 +34,50 @@ def recommend(query, user):
     cosine_similarities = cosine_similarity(query_tfidf, corpus_tfidf)
 
     indexes = np.argsort(cosine_similarities[0])[::-1]
-    queries = list(np.array(list(query))[indexes])
+    queries = list(np.array(list(vagas))[indexes])
     print(f'tfidf + cosine = {time.time() - start}')
 
     return queries
 
-def get_pdf_text(pdf_path):
+def recommend_candidatos(candidatos, user):
+    own_vagas = Vaga.objects.filter(empresa=user.empresa)
+    print(own_vagas)
 
+    start = time.time()
+
+    query_text = ""
+    for vaga in own_vagas:
+        query_text += " " + get_vaga_text(vaga)
+
+    candidatos_text = []
+    for candidato in candidatos:
+        candidatos_text.append(get_candidato_text(candidato))
+    print(f'getting text = {time.time() - start}')
+
+    ## can be done before
+    start = time.time()
+    query_text = treat_text(query_text)
+    candidatos_text = treat_text(candidatos_text)
+    print(f'treating text = {time.time() - start}')
+
+    start = time.time()
+    query_tfidf, corpus_tfidf = apply_tfidf(query_text, candidatos_text)
+    cosine_similarities = cosine_similarity(query_tfidf, corpus_tfidf)
+
+    indexes = np.argsort(cosine_similarities[0])[::-1]
+    queries = list(np.array(list(candidatos))[indexes])
+    print(f'tfidf + cosine = {time.time() - start}')
+
+    return queries
+
+def get_candidato_text(candidato):
+    candidato_text = ""
+    pdf_path = candidato.curriculo
+    candidato_text += " " + get_pdf_text(pdf_path)
+
+    return candidato_text
+
+def get_pdf_text(pdf_path):
     reader = PyPDF2.PdfReader(pdf_path)
     text = []
 
@@ -48,22 +86,17 @@ def get_pdf_text(pdf_path):
 
     text = " ".join(text)
 
-    print(f'{reader.metadata.title =}')
     return text
 
-def get_vagas_text(query):
-    vagas_text = []
-    for vaga in query:
-        cargo = vaga.cargo
-        atividades = vaga.atividades
-        requisitos = vaga.requisitos
-        empresa = vaga.empresa
-        ramo_empresa = empresa.ramo_atividade
-        descricao_empresa = empresa.descricao
+def get_vaga_text(vaga):
+    cargo = vaga.cargo
+    atividades = vaga.atividades
+    requisitos = vaga.requisitos
+    empresa = vaga.empresa
+    ramo_empresa = empresa.ramo_atividade
+    descricao_empresa = empresa.descricao
 
-        vagas_text.append(" ".join([cargo, atividades, requisitos, ramo_empresa, descricao_empresa]).replace("\n", " "))
-
-    return vagas_text
+    return " ".join([cargo, atividades, requisitos, ramo_empresa, descricao_empresa]).replace("\n", " ")
 
 def treat_text(texts):
     nltk.download('rslp')
@@ -73,7 +106,7 @@ def treat_text(texts):
         texts = [texts]
 
     for text in texts:
-        text = text.lower().split(" ")
+        text = text.lower().strip(" ").split(" ")
         text = " ".join([stemmer.stem(word) for word in text if word != ''])
         treated.append(text)
 
