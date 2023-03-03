@@ -70,9 +70,9 @@ services:
       db:
         condition: service_healthy
     environment:
-      VIRTUAL_HOST: vagas.badomen.fun
+      VIRTUAL_HOST: vagas.baraus.dev
       VIRTUAL_PORT: 8073
-      LETSENCRYPT_HOST: vagas.badomen.fun
+      LETSENCRYPT_HOST: vagas.baraus.dev
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
       - nginx
