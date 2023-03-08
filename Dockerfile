@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10-bullseye
 
 WORKDIR /app
 
@@ -7,11 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev icu-data-full py3-setuptools cmake \
-    && apk add tiff-dev jpeg-dev openjpeg-dev zlib-dev freetype-dev lcms2-dev \
-    libwebp-dev tcl-dev tk-dev harfbuzz-dev fribidi-dev libimagequant-dev \
-    libxcb-dev libpng-dev
+RUN apt-get update \
+    && apt-get install -y postgresql-server-dev-all gcc python3-dev musl-dev icu-devtools \
+    && apt-get install -y libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev \
+    liblcms2-dev libwebp-dev tcl-dev tk-dev libharfbuzz-dev libfribidi-dev libimagequant-dev \
+    libxcb1-dev libpng-dev
 
 # install dependencies
 COPY requirements.txt .
