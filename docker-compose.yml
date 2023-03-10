@@ -78,7 +78,7 @@ services:
       LETSENCRYPT_HOST: api.ceitec.baraus.dev
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
-      - nginx
+      - nginx-proxy
       - default
 
 volumes:
@@ -88,6 +88,6 @@ volumes:
     external: true
 
 networks:
-  nginx:
+  nginx-proxy:
     external: true
   
