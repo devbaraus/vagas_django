@@ -73,9 +73,9 @@ services:
       db:
         condition: service_healthy
     environment:
-      VIRTUAL_HOST: vagas.devbaraus.ddns.net
+      VIRTUAL_HOST: api.ceitec.baraus.dev
       VIRTUAL_PORT: 8073
-      LETSENCRYPT_HOST: vagas.devbaraus.ddns.net
+      LETSENCRYPT_HOST: api.ceitec.baraus.dev
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
       - nginx
