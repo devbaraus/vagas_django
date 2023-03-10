@@ -412,6 +412,9 @@ class VagaViews(AbstractViewSet):
         | (IsEmpregadorPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
+    
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializers["default"])
 
     @action(
         detail=False, methods=["get"], url_path="candidaturas/(?P<candidato_id>[^/.]+)"
@@ -501,8 +504,6 @@ class VagaViews(AbstractViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def get_serializer_class(self):
-        return self.serializers.get(self.action, self.serializers["default"])
 
     def perform_update(self, serializer):
         empresa = self.check_empresa(self.request)

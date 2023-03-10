@@ -29,8 +29,6 @@ from emprega.models import (
 class AbstractReCaptchaSerializer(serializers.ModelSerializer):
     recaptcha = ReCaptchaV2Field(write_only=True)
 
-    # pass
-
     def create(self, validated_data):
         validated_data.pop("recaptcha")
         return super().create(validated_data)
@@ -180,6 +178,7 @@ class CandidatoSerializer(UsuarioSerializer):
                 "required": False,
             },
             "is_superuser": {"read_only": True},
+            "curriculo": {"empty": True},
         }
 
     def update(self, instance, validated_data):
@@ -367,6 +366,8 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
         }
 
     def create(self, validated_data):
+        validated_data.pop("recaptcha")
+        
         with transaction.atomic():
             beneficios = validated_data.pop("beneficios", [])
             vaga = Vaga.objects.create(**validated_data)

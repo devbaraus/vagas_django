@@ -48,6 +48,8 @@ services:
     command: sh -c "python manage.py collectstatic --no-input && gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - .env
+    ports:
+      - "8000:8000"
     volumes:
       - ./src/static:/app/static
     depends_on:
@@ -64,24 +66,28 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./src/static:/static
+      - ./nginx_log:/var/log/nginx
     depends_on:
       web:
         condition: service_started
       db:
         condition: service_healthy
     environment:
-      VIRTUAL_HOST: vagas.baraus.dev
+      VIRTUAL_HOST: vagas.devbaraus.ddns.net
       VIRTUAL_PORT: 8073
-      LETSENCRYPT_HOST: vagas.baraus.dev
+      LETSENCRYPT_HOST: vagas.devbaraus.ddns.net
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
       - nginx
       - default
 
 volumes:
+  emprega_nginx:
+    external: true
   emprega_base:
     external: true
 
 networks:
   nginx:
     external: true
+  
