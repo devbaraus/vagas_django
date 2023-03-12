@@ -140,3 +140,5 @@ GitHub.sublime-settings
 !.env.example
 
 src/static
+
+**/*/bert_models

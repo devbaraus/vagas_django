@@ -6,8 +6,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from recomendacao.recommendation import recommend_vagas, recommend_candidatos
-
 from emprega.models import (
     Empresa,
     Candidatura,
@@ -158,56 +156,6 @@ class CandidatoViews(AbstractViewSet):
     @action(detail=False, methods=["GET"])
     def perfil(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(request.user)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["get"], url_path="rec")
-    def recommendation(self, request, *args, **kwargs):
-        selecionado = request.query_params.get("selecionado")
-        termo = request.query_params.get("formacao_academica")
-        salario = request.query_params.get("salario")
-        modelo_trabalho = request.query_params.get("modelo_trabalho")
-        jornada_trabalho = request.query_params.get("jornada_trabalho")
-        regime_contratual = request.query_params.get("regime_contratual")
-
-        filtering = Q()
-
-        if termo:
-            filtering &= Q(objetivo_profissional_usuario__cargo__icontains=termo)
-
-        if salario:
-            filtering &= Q(objetivo_profissional_usuario__salario__gte=salario)
-
-        if modelo_trabalho:
-            filtering &= Q(objetivo_profissional_usuario__modelo_trabalho=modelo_trabalho)
-
-        if jornada_trabalho:
-            filtering &= Q(objetivo_profissional_usuario__jornada_trabalho=jornada_trabalho)
-
-        if regime_contratual:
-            filtering &= Q(objetivo_profissional_usuario__regime_contratual=regime_contratual)
-
-        selected_vaga = None
-
-        if selecionado:
-            selected_vaga = Candidato.objects.get(id=selecionado)
-            filtering = filtering & ~Q(id=selecionado)
-
-        queryset = Candidato.objects.filter(filtering)
-
-        queryset = recommend_candidatos(queryset, request.user)
-        queryset = self.filter_queryset(queryset)
-
-        if selected_vaga:
-            queryset = [selected_vaga] + list(queryset)
-
-        queryset = self.filter_queryset(queryset)
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
@@ -488,64 +436,6 @@ class VagaViews(AbstractViewSet):
     def empresa(self, request, empresa_id, *args, **kwargs):
         empresa = get_object_or_404(Empresa, pk=empresa_id)
         queryset = self.get_queryset().filter(empresa=empresa)
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    @action(detail=False, methods=["get"], url_path="rec")
-    def recommendation(self, request, *args, **kwargs):
-        selecionado = request.query_params.get("selecionado")
-        termo = request.query_params.get("termo")
-        empresa = request.query_params.get("empresa")
-        salario = request.query_params.get("salario")
-        modelo_trabalho = request.query_params.get("modelo_trabalho")
-        jornada_trabalho = request.query_params.get("jornada_trabalho")
-        regime_contratual = request.query_params.get("regime_contratual")
-
-        filtering = Q()
-        if termo:
-            filtering &= (
-                    Q(cargo__icontains=termo)
-                    | Q(atividades__icontains=termo)
-                    | Q(requisitos__icontains=termo)
-            )
-
-        if empresa:
-            filtering &= Q(empresa__nome_fantasia__icontains=empresa) | Q(
-                empresa__razao_social__icontains=empresa
-            )
-
-        if salario:
-            filtering &= Q(salario__gte=salario)
-
-        if modelo_trabalho:
-            filtering &= Q(modelo_trabalho=modelo_trabalho)
-
-        if jornada_trabalho:
-            filtering &= Q(jornada_trabalho=jornada_trabalho)
-
-        if regime_contratual:
-            filtering &= Q(regime_contratual=regime_contratual)
-
-        selected_vaga = None
-
-        if selecionado:
-            selected_vaga = Vaga.objects.get(id=selecionado)
-            filtering = filtering & ~Q(id=selecionado)
-        queryset = self.get_queryset().filter(filtering)
-
-        ## USE THE QUERYSET AND GET RECOMMENDATIONS BASED ON IT
-        queryset = recommend_vagas(queryset, request.user)
-        queryset = self.filter_queryset(queryset)
-
-        if selected_vaga:
-            queryset = [selected_vaga] + list(queryset)
-        queryset = self.filter_queryset(queryset)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

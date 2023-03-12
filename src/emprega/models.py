@@ -2,10 +2,11 @@ from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.db import models
-
+from django.db import models, transaction
 from emprega.validators import validate_cpf, validate_cnpj
 
+from django.contrib.postgres.fields import ArrayField
+from recomendacao.tasks import process_candidato, process_vaga
 
 class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -194,6 +195,10 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
         verbose_name="Currículo", upload_to="curriculos", null=True, blank=True
     )
 
+    curriculo_processado = models.TextField(verbose_name="Currículo Processado", null=True, blank=True)
+
+    curriculo_embedding = ArrayField(models.FloatField(), blank=True, null=True)
+
     esta_ativo = models.BooleanField(verbose_name="esta_ativo", default=True)
     esta_verificado = models.BooleanField(verbose_name="esta_verificado", default=False)
 
@@ -217,6 +222,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
     REQUIRED_FIELDS = ["nome", "email", "data_nascimento"]
 
     objects = UserManager()
+
+    def save(self, process = True, *args, **kwargs):
+        super(Usuario, self).save(*args, **kwargs)
+
+        if process and self.is_candidato:
+            transaction.on_commit(lambda: process_candidato.delay(pk = self.pk))
 
     def __str__(self):
         return self.nome
@@ -417,7 +428,17 @@ class Vaga(AbstractBaseModel):
         Empresa, on_delete=models.CASCADE, related_name="vagas_empresa"
     )
 
+    vaga_processada = models.TextField(verbose_name="Vaga Processada", null=True, blank=True)
+
+    vaga_embedding = ArrayField(models.FloatField(), blank=True, null=True)
+
     history = AuditlogHistoryField()
+
+    def save(self, process = True, *args, **kwargs):
+        super(Vaga, self).save(*args, **kwargs)
+
+        if process:
+            transaction.on_commit(lambda: process_vaga.delay(pk = self.pk))
 
     def __str__(self):
         return self.cargo

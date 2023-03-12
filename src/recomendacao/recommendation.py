@@ -1,83 +1,64 @@
-import PyPDF2
+from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
-import nltk
+from unidecode import unidecode
 import numpy as np
+import PyPDF2
+import nltk
 import time
-from emprega.models import (
-    Empresa,
-    Vaga,
-    Candidato,
-    Usuario,
-)
+import os
 
-def recommend_vagas(vagas, user):
-    pdf_path = user.curriculo
-     
-    ## can be done before
-    start = time.time()
-    pdf_text = get_pdf_text(pdf_path)
-    vagas_text = []
-    for vaga in vagas:
-        vagas_text.append(get_vaga_text(vaga))
-    print(f'getting text = {time.time() - start}')
 
-    ## can be done before
+def process_candidato_tfidf(curriculo):
     start = time.time()
-    pdf_text = treat_text(pdf_text)
-    vagas_text = treat_text(vagas_text)
-    print(f'treating text = {time.time() - start}')
+    text = get_pdf_text(str(curriculo))
 
+    text = treat_text(text)
+    return text
+
+def process_vaga_tfidf(vaga_text):
     start = time.time()
-    query_tfidf, corpus_tfidf = apply_tfidf(pdf_text, vagas_text)
+    vaga_text = treat_text(vaga_text)
+
+    return vaga_text
+
+def recommend_vagas_tfidf(vagas, user):
+    start = time.time()
+
+    user_text = [str(user.curriculo_processado)]
+    vagas_text = [str(vaga.vaga_processada) for vaga in vagas]
+
+    query_tfidf, corpus_tfidf = apply_tfidf(user_text, vagas_text)
     cosine_similarities = cosine_similarity(query_tfidf, corpus_tfidf)
 
     indexes = np.argsort(cosine_similarities[0])[::-1]
     queries = list(np.array(list(vagas))[indexes])
+
     print(f'tfidf + cosine = {time.time() - start}')
 
     return queries
 
-def recommend_candidatos(candidatos, user):
-    own_vagas = Vaga.objects.filter(empresa=user.empresa)
-    print(own_vagas)
-
+def recommend_candidatos_tfidf(candidatos, vaga):
     start = time.time()
 
-    query_text = ""
-    for vaga in own_vagas:
-        query_text += " " + get_vaga_text(vaga)
-
-    candidatos_text = []
-    for candidato in candidatos:
-        candidatos_text.append(get_candidato_text(candidato))
-    print(f'getting text = {time.time() - start}')
-
-    ## can be done before
-    start = time.time()
-    query_text = treat_text(query_text)
-    candidatos_text = treat_text(candidatos_text)
-    print(f'treating text = {time.time() - start}')
-
-    start = time.time()
-    query_tfidf, corpus_tfidf = apply_tfidf(query_text, candidatos_text)
+    vaga_text = [str(vaga.vaga_processada)]
+    candidatos_text = [str(candidato.curriculo_processado) for candidato in candidatos]
+ 
+    query_tfidf, corpus_tfidf = apply_tfidf(vaga_text, candidatos_text)
     cosine_similarities = cosine_similarity(query_tfidf, corpus_tfidf)
 
     indexes = np.argsort(cosine_similarities[0])[::-1]
     queries = list(np.array(list(candidatos))[indexes])
+
     print(f'tfidf + cosine = {time.time() - start}')
 
     return queries
 
-def get_candidato_text(candidato):
-    candidato_text = ""
-    pdf_path = candidato.curriculo
-    candidato_text += " " + get_pdf_text(pdf_path)
-
-    return candidato_text
-
 def get_pdf_text(pdf_path):
+    media_path = os.path.join(os.path.dirname(__file__), '../media')
+    pdf_path = os.path.join(media_path, pdf_path)
+    
     reader = PyPDF2.PdfReader(pdf_path)
     text = []
 
@@ -88,29 +69,14 @@ def get_pdf_text(pdf_path):
 
     return text
 
-def get_vaga_text(vaga):
-    cargo = vaga.cargo
-    atividades = vaga.atividades
-    requisitos = vaga.requisitos
-    empresa = vaga.empresa
-    ramo_empresa = empresa.ramo_atividade
-    descricao_empresa = empresa.descricao
-
-    return " ".join([cargo, atividades, requisitos, ramo_empresa, descricao_empresa]).replace("\n", " ")
-
-def treat_text(texts):
+def treat_text(text):
     nltk.download('rslp')
     stemmer = nltk.stem.RSLPStemmer()
-    treated = []
-    if type(texts) == str:
-        texts = [texts]
+    text = text.lower().strip(" ").split(" ")
+    text = " ".join([stemmer.stem(word) for word in text if word != ''])
+    text = unidecode(str(text))
 
-    for text in texts:
-        text = text.lower().strip(" ").split(" ")
-        text = " ".join([stemmer.stem(word) for word in text if word != ''])
-        treated.append(text)
-
-    return treated
+    return text
 
 def apply_tfidf(query, corpus):
     nltk.download('stopwords')
@@ -122,3 +88,83 @@ def apply_tfidf(query, corpus):
     query_tfidf = vectorizer.transform(query)
 
     return query_tfidf, corpus_tfidf
+
+def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
+    model_path = os.path.join(os.path.dirname(__file__), f'bert_models/{model_name}')
+
+    try:
+        model = SentenceTransformer(model_path, device="cpu")
+    except:
+        print("Model not found in local directory")
+        model = SentenceTransformer(model_name, device="cpu")
+        model.save(model_path)
+        print(f'Model saved at {model_path}')
+
+    return model
+
+def process_candidato_bert(curriculo):
+    start = time.time()
+
+    model = load_bert_model()
+    print("processando curriculo do usuario")
+    text = get_pdf_text(str(curriculo))
+
+    embedding = model.encode(text, show_progress_bar = False).tolist()
+
+    return embedding
+
+def process_vaga_bert(text):
+    start = time.time()
+
+    model = load_bert_model()
+
+    embedding = model.encode(text, show_progress_bar = False).tolist()
+
+    return embedding
+
+def recommend_vagas_bert(vagas, user):
+    start = time.time()
+
+    user_embedding = [user.curriculo_embedding]
+    vagas_embedding = [vaga.vaga_embedding for vaga in vagas]
+
+    cosine_similarities = cosine_similarity(user_embedding, vagas_embedding)
+
+    indexes = np.argsort(cosine_similarities[0])[::-1]
+    queries = list(np.array(list(vagas))[indexes])
+
+    print(f'bert + cosine = {time.time() - start}')
+
+    return queries
+
+def recommend_candidatos_bert(candidatos, vaga):
+    start = time.time()
+
+    vaga_embedding = [vaga.vaga_embedding]
+    candidatos_embedding = [candidato.curriculo_embedding for candidato in candidatos]
+ 
+    cosine_similarities = cosine_similarity(vaga_embedding, candidatos_embedding)
+
+    indexes = np.argsort(cosine_similarities[0])[::-1]
+    queries = list(np.array(list(candidatos))[indexes])
+
+    print(f'bert + cosine = {time.time() - start}')
+
+    return queries
+
+
+from django.apps import apps
+
+def teste():
+    Usuario = apps.get_model('emprega.Usuario')
+    Vaga = apps.get_model('emprega.Vaga')
+
+    usuarios = Usuario.objects.filter(nivel_usuario=4)
+    vagas = Vaga.objects.all()
+    usuario = Usuario.objects.get(pk = 1)
+    vaga = Vaga.objects.get(pk=1)
+
+    vagas_rec = recommend_vagas_bert(vagas, usuario)
+    candidatos_rec = recommend_candidatos_bert(usuarios,vaga)
+
+    return vagas_rec, candidatos_rec

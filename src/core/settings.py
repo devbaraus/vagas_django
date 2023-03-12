@@ -210,3 +210,11 @@ sentry_sdk.init(
 
 # RECAPTCHA
 DRF_RECAPTCHA_SECRET_KEY = os.getenv("DRF_RECAPTCHA_SECRET_KEY", None)
+
+# CELERY
+CELERY_BROKER_URL = "redis://redis:6379"
+# CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "America/Sao_Paulo"
