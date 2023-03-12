@@ -11,14 +11,12 @@ import os
 
 
 def process_candidato_tfidf(curriculo):
-    start = time.time()
     text = get_pdf_text(str(curriculo))
 
     text = treat_text(text)
     return text
 
 def process_vaga_tfidf(vaga_text):
-    start = time.time()
     vaga_text = treat_text(vaga_text)
 
     return vaga_text
@@ -44,7 +42,7 @@ def recommend_candidatos_tfidf(candidatos, vaga):
 
     vaga_text = [str(vaga.vaga_processada)]
     candidatos_text = [str(candidato.curriculo_processado) for candidato in candidatos]
- 
+
     query_tfidf, corpus_tfidf = apply_tfidf(vaga_text, candidatos_text)
     cosine_similarities = cosine_similarity(query_tfidf, corpus_tfidf)
 
@@ -103,10 +101,7 @@ def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
     return model
 
 def process_candidato_bert(curriculo):
-    start = time.time()
-
     model = load_bert_model()
-    print("processando curriculo do usuario")
     text = get_pdf_text(str(curriculo))
 
     embedding = model.encode(text, show_progress_bar = False).tolist()
@@ -114,8 +109,6 @@ def process_candidato_bert(curriculo):
     return embedding
 
 def process_vaga_bert(text):
-    start = time.time()
-
     model = load_bert_model()
 
     embedding = model.encode(text, show_progress_bar = False).tolist()
@@ -142,7 +135,7 @@ def recommend_candidatos_bert(candidatos, vaga):
 
     vaga_embedding = [vaga.vaga_embedding]
     candidatos_embedding = [candidato.curriculo_embedding for candidato in candidatos]
- 
+
     cosine_similarities = cosine_similarity(vaga_embedding, candidatos_embedding)
 
     indexes = np.argsort(cosine_similarities[0])[::-1]
@@ -161,7 +154,7 @@ def teste():
 
     usuarios = Usuario.objects.filter(nivel_usuario=4)
     vagas = Vaga.objects.all()
-    usuario = Usuario.objects.get(pk = 1)
+    usuario = Usuario.objects.get(cpf = "13673179675")
     vaga = Vaga.objects.get(pk=1)
 
     vagas_rec = recommend_vagas_bert(vagas, usuario)
