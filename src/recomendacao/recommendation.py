@@ -56,7 +56,7 @@ def recommend_candidatos_tfidf(candidatos, vaga):
 def get_pdf_text(pdf_path):
     media_path = os.path.join(os.path.dirname(__file__), '../media')
     pdf_path = os.path.join(media_path, pdf_path)
-    
+
     reader = PyPDF2.PdfReader(pdf_path)
     text = []
 
@@ -92,7 +92,7 @@ def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
 
     try:
         model = SentenceTransformer(model_path, device="cpu")
-    except:
+    except FileNotFoundError:
         print("Model not found in local directory")
         model = SentenceTransformer(model_name, device="cpu")
         model.save(model_path)

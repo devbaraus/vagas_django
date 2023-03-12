@@ -7,7 +7,7 @@ def process_candidato(pk):
     Usuario = apps.get_model('emprega.Usuario')
 
     candidato = Usuario.objects.get(pk=pk)
-    
+
     processed_text = process_candidato_tfidf(candidato.curriculo)
     candidato.curriculo_processado = processed_text
 
