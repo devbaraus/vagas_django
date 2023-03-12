@@ -92,7 +92,7 @@ def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
 
     try:
         model = SentenceTransformer(model_path, device="cpu")
-    except FileNotFoundError:
+    except ValueError:
         print("Model not found in local directory")
         model = SentenceTransformer(model_name, device="cpu")
         model.save(model_path)
