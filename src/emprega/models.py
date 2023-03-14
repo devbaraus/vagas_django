@@ -223,11 +223,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
 
     objects = UserManager()
 
-    def save(self, process = True, *args, **kwargs):
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+        
         super(Usuario, self).save(*args, **kwargs)
 
-        if process and self.is_candidato:
+        if process:
             transaction.on_commit(lambda: process_candidato.delay(pk = self.pk))
+        print(f'processando? {process}')
 
     def __str__(self):
         return self.nome
@@ -434,11 +437,14 @@ class Vaga(AbstractBaseModel):
 
     history = AuditlogHistoryField()
 
-    def save(self, process = True, *args, **kwargs):
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+
         super(Vaga, self).save(*args, **kwargs)
 
         if process:
             transaction.on_commit(lambda: process_vaga.delay(pk = self.pk))
+        print(f'processando? {process}')
 
     def __str__(self):
         return self.cargo

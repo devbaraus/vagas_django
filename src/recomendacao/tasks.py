@@ -16,7 +16,7 @@ def process_candidato(pk):
 
     print(f'usuario {candidato} - {candidato.pk} processado')
 
-    candidato.save(process=False)
+    candidato.save(process = False)
 
 
 @shared_task(name='process_vaga')
@@ -35,4 +35,4 @@ def process_vaga(pk):
 
     print(f'vaga {vaga} - {vaga.pk} processada')
 
-    vaga.save(process=False)
+    vaga.save(process = False)
