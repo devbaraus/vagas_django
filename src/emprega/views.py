@@ -458,7 +458,7 @@ class VagaViews(AbstractViewSet):
         regime_contratual = request.query_params.get("regime_contratual")
 
         filtering = Q()
-
+        
         if termo:
             filtering &= (
                     Q(cargo__icontains=termo)

@@ -57,6 +57,7 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+
   nginx:
     container_name: emprega_nginx
     image: nginx:stable-alpine
@@ -80,6 +81,27 @@ services:
     networks:
       - nginx-proxy
       - default
+
+  redis:
+    container_name: emprega_redis
+    image: redis:alpine
+    
+  celery:
+    container_name: emprega_celery
+    restart: always
+    build:
+      context: .
+    command: celery --app=core worker --loglevel=info -E
+    volumes:
+      - ./src:/app
+    env_file:
+      - .env
+    environment:
+      - OMP_NUM_THREADS=1
+    depends_on:
+      - db
+      - redis
+      - web
 
 volumes:
   emprega_nginx:
