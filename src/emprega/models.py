@@ -2,11 +2,12 @@ from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.db import models, transaction
-from emprega.validators import validate_cpf, validate_cnpj
-
 from django.contrib.postgres.fields import ArrayField
+from django.db import models, transaction
+
+from emprega.validators import validate_cpf, validate_cnpj
 from recomendacao.tasks import process_candidato, process_vaga
+
 
 class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -14,6 +15,7 @@ class AbstractBaseModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ["-created_at"]
 
 
 class UsuarioNivelChoices(models.IntegerChoices):
@@ -223,21 +225,24 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
 
     objects = UserManager()
 
-    def save(self, *args, **kwargs):
-        process = kwargs.pop("process", True)
-        
-        super(Usuario, self).save(*args, **kwargs)
-
-        if process:
-            transaction.on_commit(lambda: process_candidato.delay(pk = self.pk))
-        print(f'processando? {process}')
-
     def __str__(self):
         return self.nome
 
 
 class Candidato(Usuario):
     objects = CandidatoManager()
+
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+        created = kwargs.get("created", False)
+
+        print('hrer')
+
+        if process and created:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
+            print(f'processando? {process}')
+
+        super(Usuario, self).save(*args, **kwargs)
 
     class Meta:
         proxy = True
@@ -443,7 +448,7 @@ class Vaga(AbstractBaseModel):
         super(Vaga, self).save(*args, **kwargs)
 
         if process:
-            transaction.on_commit(lambda: process_vaga.delay(pk = self.pk))
+            transaction.on_commit(lambda: process_vaga.delay(pk=self.pk))
         print(f'processando? {process}')
 
     def __str__(self):

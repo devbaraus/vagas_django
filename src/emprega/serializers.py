@@ -30,7 +30,7 @@ class AbstractReCaptchaSerializer(serializers.ModelSerializer):
     recaptcha = ReCaptchaV2Field(write_only=True)
 
     def create(self, validated_data):
-        validated_data.pop("recaptcha")
+        validated_data.pop("recaptcha", None)
         return super().create(validated_data)
 
 
@@ -160,6 +160,10 @@ class EmpregadorCreateSerializer(UsuarioSerializer):
             return user
 
 
+class EmpregadorCreateInternalSerializer(EmpregadorCreateSerializer):
+    recaptcha = None
+
+
 class EmpregadorListSerializer(UsuarioSerializer):
     class Meta:
         model = Empregador
@@ -178,7 +182,6 @@ class CandidatoSerializer(UsuarioSerializer):
                 "required": False,
             },
             "is_superuser": {"read_only": True},
-            "curriculo": {"empty": True},
         }
 
     def update(self, instance, validated_data):
@@ -197,14 +200,24 @@ class CandidatoSerializer(UsuarioSerializer):
 
 class CandidatoListSerializer(UsuarioSerializer):
     objetivo_profissional = serializers.SerializerMethodField()
+    formacao_academica = serializers.SerializerMethodField()
+    experiencia_profissional = serializers.SerializerMethodField()
 
     class Meta:
         model = Candidato
-        fields = ["id", "nome", "objetivo_profissional"]
+        fields = ["id", "nome", "objetivo_profissional", "formacao_academica", "experiencia_profissional"]
+
+    def get_experiencia_profissional(self, obj):
+        item = ExperienciaProfissional.objects.filter(usuario=obj).order_by("-data_fim")
+        return ExperienciaProfissionalSerializer(item).data
+
+    def get_formacao_academica(self, obj):
+        item = FormacaoAcademica.objects.filter(usuario=obj).order_by("-data_conclusao")
+        return FormacaoAcademicaSerializer(item, many=True).data
 
     def get_objetivo_profissional(self, obj):
         item = ObjetivoProfissional.objects.filter(usuario=obj).first()
-        return ObjetivoProfissionalSerializer(item).data
+        return ObjetivoProfissionalSerializer(item, many=True).data
 
 
 class CandidatoCreateSerializer(UsuarioSerializer):
@@ -273,6 +286,10 @@ class CandidatoCreateSerializer(UsuarioSerializer):
             return user
 
 
+class CandidatoCreateInternalSerializer(CandidatoCreateSerializer):
+    recaptcha = None
+
+
 class EmpresaSerializer(AbstractReCaptchaSerializer):
     foto = serializers.ImageField(required=False, allow_null=True)
 
@@ -336,7 +353,6 @@ class LogEntrySerializer(AbstractReCaptchaSerializer):
 class VagaSerializer(serializers.ModelSerializer):
     beneficios = BeneficioSerializer(many=True, read_only=True)
     empresa = EmpresaVagaSerializer(read_only=True)
-    history = serializers.SerializerMethodField()
 
     class Meta:
         model = Vaga
@@ -346,9 +362,6 @@ class VagaSerializer(serializers.ModelSerializer):
                 "required": False,
             },
         }
-
-    def get_history(self, obj):
-        return LogEntrySerializer(obj.history.all(), many=True).data
 
 
 class VagaCreateSerializer(AbstractReCaptchaSerializer):
@@ -366,8 +379,6 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
         }
 
     def create(self, validated_data):
-        validated_data.pop("recaptcha")
-        
         with transaction.atomic():
             beneficios = validated_data.pop("beneficios", [])
             vaga = Vaga.objects.create(**validated_data)
@@ -385,6 +396,10 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
             return instance
 
 
+class VagaCreateInternalSerializer(VagaCreateSerializer):
+    recaptcha = None
+
+
 class AvaliacaoSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Avaliacao
@@ -400,6 +415,10 @@ class ObjetivoProfissionalSerializer(AbstractReCaptchaSerializer):
         }
 
 
+class ObjetivoProfissionalInternalSerializer(ObjetivoProfissionalSerializer):
+    recaptcha = None
+
+
 class FormacaoAcademicaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = FormacaoAcademica
@@ -407,6 +426,10 @@ class FormacaoAcademicaSerializer(AbstractReCaptchaSerializer):
         extra_kwargs = {
             "usuario": {"required": False},
         }
+
+
+class FormacaoAcademicaInternalSerializer(FormacaoAcademicaSerializer):
+    recaptcha = None
 
 
 class ExperienciaProfissionalSerializer(AbstractReCaptchaSerializer):
@@ -418,6 +441,10 @@ class ExperienciaProfissionalSerializer(AbstractReCaptchaSerializer):
         }
 
 
+class ExperienciaProfissionalInternalSerializer(ExperienciaProfissionalSerializer):
+    recaptcha = None
+
+
 class IdiomaSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Idioma
@@ -425,6 +452,10 @@ class IdiomaSerializer(AbstractReCaptchaSerializer):
         extra_kwargs = {
             "usuario": {"required": False},
         }
+
+
+class IdiomaInternalSerializer(IdiomaSerializer):
+    recaptcha = None
 
 
 class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
@@ -440,6 +471,10 @@ class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
             if instance.certificado and os.path.isfile(instance.certificado.path):
                 os.remove(instance.certificado.path)
             instance.certificado = validated_data["certificado"]
+
+
+class CursoEspecializacaoInternalSerializer(CursoEspecializacaoSerializer):
+    recaptcha = None
 
 
 class CandidaturaSerializer(serializers.ModelSerializer):

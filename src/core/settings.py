@@ -20,7 +20,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, "../.env.dev"))
+environ.Env.read_env(os.path.join(BASE_DIR, "../.env.local"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -56,6 +56,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+APPEND_SLASH = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -183,7 +184,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
         # 'rest_framework.permissions.IsAuthenticated'
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
 
@@ -212,9 +213,9 @@ sentry_sdk.init(
 DRF_RECAPTCHA_SECRET_KEY = os.getenv("DRF_RECAPTCHA_SECRET_KEY", None)
 
 # CELERY
-CELERY_BROKER_URL = "redis://redis:6379"
-# CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379")
+CELERY_TIMEZONE = os.getenv("TIMEZONE", "America/Sao_Paulo")
+
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = "America/Sao_Paulo"

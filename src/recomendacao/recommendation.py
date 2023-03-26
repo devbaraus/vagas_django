@@ -1,13 +1,14 @@
+import os
+import time
+
+import PyPDF2
+import nltk
+import numpy as np
+from nltk.corpus import stopwords
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.corpus import stopwords
 from unidecode import unidecode
-import numpy as np
-import PyPDF2
-import nltk
-import time
-import os
 
 
 def process_candidato_tfidf(curriculo):
@@ -16,10 +17,12 @@ def process_candidato_tfidf(curriculo):
     text = treat_text(text)
     return text
 
+
 def process_vaga_tfidf(vaga_text):
     vaga_text = treat_text(vaga_text)
 
     return vaga_text
+
 
 def recommend_vagas_tfidf(vagas, user):
     start = time.time()
@@ -37,6 +40,7 @@ def recommend_vagas_tfidf(vagas, user):
 
     return queries
 
+
 def recommend_candidatos_tfidf(candidatos, vaga):
     start = time.time()
 
@@ -53,6 +57,7 @@ def recommend_candidatos_tfidf(candidatos, vaga):
 
     return queries
 
+
 def get_pdf_text(pdf_path):
     media_path = os.path.join(os.path.dirname(__file__), '../media')
     pdf_path = os.path.join(media_path, pdf_path)
@@ -67,6 +72,7 @@ def get_pdf_text(pdf_path):
 
     return text
 
+
 def treat_text(text):
     nltk.download('rslp')
     stemmer = nltk.stem.RSLPStemmer()
@@ -75,6 +81,7 @@ def treat_text(text):
     text = unidecode(str(text))
 
     return text
+
 
 def apply_tfidf(query, corpus):
     nltk.download('stopwords')
@@ -87,7 +94,8 @@ def apply_tfidf(query, corpus):
 
     return query_tfidf, corpus_tfidf
 
-def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
+
+def load_bert_model(model_name="paraphrase-multilingual-MiniLM-L12-v2"):
     model_path = os.path.join(os.path.dirname(__file__), f'bert_models/{model_name}')
 
     try:
@@ -100,20 +108,23 @@ def load_bert_model(model_name = "paraphrase-multilingual-MiniLM-L12-v2"):
 
     return model
 
+
 def process_candidato_bert(curriculo):
     model = load_bert_model()
     text = get_pdf_text(str(curriculo))
 
-    embedding = model.encode(text, show_progress_bar = False).tolist()
+    embedding = model.encode(text, show_progress_bar=False).tolist()
 
     return embedding
+
 
 def process_vaga_bert(text):
     model = load_bert_model()
 
-    embedding = model.encode(text, show_progress_bar = False).tolist()
+    embedding = model.encode(text, show_progress_bar=False).tolist()
 
     return embedding
+
 
 def recommend_vagas_bert(vagas, user):
     start = time.time()
@@ -129,6 +140,7 @@ def recommend_vagas_bert(vagas, user):
     print(f'bert + cosine = {time.time() - start}')
 
     return queries
+
 
 def recommend_candidatos_bert(candidatos, vaga):
     start = time.time()
@@ -146,18 +158,18 @@ def recommend_candidatos_bert(candidatos, vaga):
     return queries
 
 
-from django.apps import apps
+if __name__ == '__main__':
+    from django.apps import apps
 
-def teste():
     Usuario = apps.get_model('emprega.Usuario')
     Vaga = apps.get_model('emprega.Vaga')
 
     usuarios = Usuario.objects.filter(nivel_usuario=4)
     vagas = Vaga.objects.all()
-    usuario = Usuario.objects.get(cpf = "13673179675")
+    usuario = Usuario.objects.get(cpf="13673179675")
     vaga = Vaga.objects.get(pk=1)
 
     vagas_rec = recommend_vagas_bert(vagas, usuario)
-    candidatos_rec = recommend_candidatos_bert(usuarios,vaga)
+    candidatos_rec = recommend_candidatos_bert(usuarios, vaga)
 
-    return vagas_rec, candidatos_rec
+    print(vagas_rec, candidatos_rec)

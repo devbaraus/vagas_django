@@ -45,7 +45,6 @@ from emprega.serializers import (
     CandidatoSerializer,
     EmpregadorSerializer,
     UsuarioSerializer,
-    CandidatoListSerializer,
     EmpregadorListSerializer,
     EmpregadorCreateSerializer,
     CandidatoCreateSerializer,
@@ -56,6 +55,10 @@ from emprega.serializers import (
     BeneficioSerializer,
     VagaCreateSerializer,
 )
+from recomendacao.recommendation import recommend_vagas_tfidf, recommend_vagas_bert, recommend_candidatos_tfidf, \
+    recommend_candidatos_bert
+
+RECOMMENDATION_ALGORITHM = 'tfidf'
 
 
 class AbstractViewSet(
@@ -141,7 +144,7 @@ class UserViews(AbstractViewSet):
 class CandidatoViews(AbstractViewSet):
     serializers = {
         "default": CandidatoSerializer,
-        "list": CandidatoListSerializer,
+        "list": CandidatoPerfilSerializer,
         "create": CandidatoCreateSerializer,
         "perfil": CandidatoPerfilSerializer,
     }
@@ -165,6 +168,13 @@ class CandidatoViews(AbstractViewSet):
         modelo_trabalho = request.query_params.get("modelo_trabalho")
         jornada_trabalho = request.query_params.get("jornada_trabalho")
         regime_contratual = request.query_params.get("regime_contratual")
+        vaga = request.query_params.get("vaga")
+        recomendacao = request.query_params.get("recomendacao", False)
+
+        vaga_obj = None
+
+        if vaga:
+            vaga_obj = get_object_or_404(Vaga, id=vaga)
 
         filtering = Q()
 
@@ -183,25 +193,34 @@ class CandidatoViews(AbstractViewSet):
         if regime_contratual:
             filtering &= Q(objetivo_profissional_usuario__regime_contratual=regime_contratual)
 
-        selected_vaga = None
+        if vaga_obj:
+            filtering &= Q(candidaturas_usuario__vaga=vaga_obj)
+
+        selected_candidato = None
 
         if selecionado:
-            selected_vaga = Candidato.objects.get(id=selecionado)
+            selected_candidato = Candidato.objects.get(id=selecionado)
             filtering = filtering & ~Q(id=selecionado)
 
         queryset = Candidato.objects.filter(filtering)
 
-        if selected_vaga:
-            queryset = [selected_vaga] + list(queryset)
+        if recomendacao and vaga_obj:
+            if RECOMMENDATION_ALGORITHM == 'bert':
+                queryset = recommend_candidatos_bert(queryset, vaga_obj)
+            if RECOMMENDATION_ALGORITHM == 'tfidf':
+                queryset = recommend_candidatos_tfidf(queryset, vaga_obj)
 
-        queryset = self.filter_queryset(queryset)
+        if selected_candidato:
+            queryset = [selected_candidato] + list(queryset)
 
         page = self.paginate_queryset(queryset)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
+
         return Response(serializer.data)
 
 
@@ -412,7 +431,7 @@ class VagaViews(AbstractViewSet):
         | (IsEmpregadorPermission & OwnedByPermission)
         | ReadOnlyPermission,
     ]
-    
+
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers["default"])
 
@@ -456,9 +475,10 @@ class VagaViews(AbstractViewSet):
         modelo_trabalho = request.query_params.get("modelo_trabalho")
         jornada_trabalho = request.query_params.get("jornada_trabalho")
         regime_contratual = request.query_params.get("regime_contratual")
+        recomendacao = request.query_params.get("recomendacao", "")
 
         filtering = Q()
-        
+
         if termo:
             filtering &= (
                     Q(cargo__icontains=termo)
@@ -491,19 +511,23 @@ class VagaViews(AbstractViewSet):
 
         queryset = self.get_queryset().filter(filtering)
 
+        if recomendacao:
+            if RECOMMENDATION_ALGORITHM == "tfidf":
+                queryset = recommend_vagas_tfidf(queryset, request.user)
+            if RECOMMENDATION_ALGORITHM == "bert":
+                queryset = recommend_vagas_bert(queryset, request.user)
+
         if selected_vaga:
             queryset = [selected_vaga] + list(queryset)
 
-        queryset = self.filter_queryset(queryset)
-
         page = self.paginate_queryset(queryset)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
 
     def perform_update(self, serializer):
         empresa = self.check_empresa(self.request)

@@ -1,21 +1,87 @@
 services:
   db:
-    restart: unless-stopped
+    container_name: emprega_db
+    image: postgres:13-alpine
     volumes:
-      - ./emprega_base:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - ./db:/var/lib/postgresql/data
     env_file:
-      - .env.dev
+      - .env
+    ports:
+      - 5432:5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER} -d ${DB_NAME}"
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 40
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
+
+  migrate:
+    container_name: emprega_migrate
+    image: devbaraus/emprega:latest
+    command: python manage.py migrate --noinput
+    env_file:
+      - .env
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python manage.py migrate --check --dry-run"
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app
+
   web:
-    command: python manage.py runserver 0.0.0.0:8000
+    container_name: emprega_web
+    build: .
+    image: devbaraus/emprega:latest
+    restart: unless-stopped
+    command: sh -c "python manage.py runserver"
+    environment:
+      - UID=1000
+      - GID=1000
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      celery:
+        condition: service_started
+
+  redis:
+    container_name: emprega_redis
+    image: redis:alpine
+
+  celery:
+    container_name: emprega_celery
+    restart: always
+    build:
+      context: .
+    command: celery --app=core worker --loglevel=info -E
     volumes:
       - ./src:/app
     env_file:
-      - .env.dev
-    ports:
-      - "8000:8000"
+      - .env
+    environment:
+      - OMP_NUM_THREADS=1
+    depends_on:
+      - db
+      - redis
