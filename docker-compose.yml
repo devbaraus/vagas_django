@@ -86,7 +86,7 @@ services:
   redis:
     container_name: emprega_redis
     image: redis:alpine
-    
+
   celery:
     container_name: emprega_celery
     image: devbaraus/emprega:latest
@@ -105,10 +105,8 @@ services:
 
 volumes:
   emprega_base:
-
+    external: true
 
 networks:
-  default:
-    external:
-      name: nginx-proxy
-  
+  nginx-proxy:
+    external: true
