@@ -1,0 +1,170 @@
+[
+  {
+    "cargo": "Engenheiro de Dados",
+    "atividades": "Criar e manter sistemas de processamento e análise de dados, utilizando ferramentas como Hadoop, Spark, AWS, entre outras. Desenvolver pipelines de dados para integração e transformação de informações de diferentes fontes. Monitorar e garantir a qualidade dos dados processados. Trabalhar em equipe com cientistas de dados e outros engenheiros para desenvolver soluções de análise de dados.",
+    "requisitos": "Experiência prévia em engenharia de dados ou áreas afins. Conhecimento avançado em Hadoop, Spark, bancos de dados relacionais e não-relacionais. Formação em Ciência da Computação, Engenharia da Computação ou áreas afins. Habilidade em resolução de problemas, trabalho em equipe e boa comunicação.",
+    "salario": 10000
+  },
+  {
+    "cargo": "Analista de Marketing Digital",
+    "atividades": "Desenvolver e executar estratégias de marketing digital, utilizando técnicas de SEO, campanhas de email marketing, gerenciamento de redes sociais e análise de métricas. Elaborar relatórios e apresentações para a diretoria e clientes. Identificar oportunidades de crescimento e melhorias nas estratégias de marketing.",
+    "requisitos": "Experiência prévia em marketing digital. Conhecimento avançado em ferramentas de análise de métricas e SEO. Formação em Marketing, Publicidade ou áreas afins. Habilidade em comunicação oral e escrita, bom relacionamento interpessoal e proatividade.",
+    "salario": 5000
+  },
+  {
+    "cargo": "Desenvolvedor Full-Stack",
+    "atividades": "Desenvolver aplicações web e mobile utilizando as tecnologias mais modernas do mercado. Trabalhar em equipe para a entrega de soluções de alta qualidade e performance. Participar de reuniões de planejamento e definir as melhores abordagens para as demandas do projeto.",
+    "requisitos": "Experiência prévia em desenvolvimento de software. Conhecimento em tecnologias como React, Node.js, SQL, MongoDB, entre outras. Ensino superior completo ou em andamento em áreas relacionadas. Boa comunicação e habilidades interpessoais.",
+    "salario": 8000
+  },
+  {
+    "cargo": "Gerente de Projetos",
+    "atividades": "Gerenciar projetos do início ao fim, incluindo planejamento, execução e controle. Definir objetivos, cronogramas e orçamentos para cada projeto. Coordenar e liderar equipes multidisciplinares para a entrega dos projetos. Identificar riscos e tomar decisões estratégicas para garantir o sucesso do projeto. Reportar o progresso do projeto para a diretoria e stakeholders.",
+    "requisitos": "Experiência prévia em gestão de projetos. Conhecimento avançado em metodologias ágeis e ferramentas de gerenciamento de projetos. Formação em Administração, Engenharia, Ciência da Computação ou áreas afins. Habilidade em liderança, negociação e resolução de conflitos.",
+    "salario": 12000
+  },
+  {
+    "cargo": "Gerente de Recursos Humanos",
+    "atividades": "Gerenciar todas as atividades relacionadas aos recursos humanos da empresa, incluindo recrutamento e seleção, treinamento e desenvolvimento, benefícios e remuneração. Desenvolver e implementar políticas e práticas que promovam um ambiente de trabalho saudável e produtivo. Garantir o cumprimento das políticas e regulamentações trabalhistas. ",
+    "requisitos": "Experiência prévia em gestão de recursos humanos. Conhecimento em leis trabalhistas, recrutamento e seleção, treinamento e desenvolvimento, benefícios e remuneração. Formação em Administração, Psicologia ou áreas afins. Habilidade em liderança, comunicação, resolução de conflitos e negociação.",
+    "salario": 12000
+  },
+  {
+    "cargo": "Assistente Administrativo",
+    "atividades": "Realizar atividades administrativas como atendimento telefônico, recebimento e envio de correspondências, organização de documentos, controle de estoque e outras demandas administrativas. Auxiliar em processos de compras e vendas. Suporte em atividades financeiras como contas a pagar e a receber. ",
+    "requisitos": "Experiência prévia em atividades administrativas. Conhecimento básico em pacote Office. Formação em Administração, Contabilidade ou áreas afins. Habilidade em organização, proatividade e bom relacionamento interpessoal.",
+    "salario": 3000
+  },
+  {
+    "cargo": "Consultor de Vendas",
+    "atividades": "Realizar vendas de produtos ou serviços, oferecendo suporte e consultoria para o cliente em relação ao produto ou serviço ofertado. Prospectar novos clientes, identificando suas necessidades e oferecendo soluções adequadas. Fazer acompanhamento e pós-venda, garantindo a satisfação do cliente. ",
+    "requisitos": "Experiência prévia em vendas. Conhecimento em técnicas de vendas e negociação. Habilidade em comunicação oral e escrita, relacionamento interpessoal e trabalho em equipe. Ensino superior em Administração, Marketing ou áreas afins.",
+    "salario": 5000
+  },
+  {
+    "cargo": "Analista de Suporte",
+    "atividades": "Realizar atendimento ao cliente, identificando e solucionando problemas relacionados aos produtos ou serviços da empresa. Realizar manutenção preventiva e corretiva em equipamentos e sistemas. Realizar instalação e configuração de equipamentos e sistemas. ",
+    "requisitos": "Experiência prévia em suporte técnico. Conhecimento em sistemas operacionais, redes de computadores e hardware. Formação em Engenharia da Computação, Ciência da Computação ou áreas afins. Habilidade em comunicação oral e escrita, trabalho em equipe e resolução de problemas.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Analista de Sistemas",
+    "atividades": "Realizar análise, desenvolvimento e manutenção de sistemas de informação. Realizar testes de software e documentação de sistemas. Realizar manutenção preventiva e corretiva em equipamentos e sistemas. Realizar instalação e configuração de equipamentos e sistemas. ",
+    "requisitos": "Experiência prévia em desenvolvimento de software. Conhecimento em linguagens de programação, sistemas operacionais, redes de computadores e hardware. Formação em Engenharia da Computação, Ciência da Computação ou áreas afins. Habilidade em comunicação oral e escrita, trabalho em equipe e resolução de problemas.",
+    "salario": 6000
+  },
+  {
+    "cargo": "Analista de Testes",
+    "atividades": "Realizar testes de software e documentação de sistemas. Realizar manutenção preventiva e corretiva em equipamentos e sistemas. Realizar instalação e configuração de equipamentos e sistemas. Realizar análise, desenvolvimento e manutenção de sistemas de informação. ",
+    "requisitos": "Experiência prévia em desenvolvimento de software. Conhecimento em linguagens de programação, sistemas operacionais, redes de computadores e hardware. Formação em Engenharia da Computação, Ciência da Computação ou áreas afins. Habilidade em comunicação oral e escrita, trabalho em equipe e resolução de problemas.",
+    "salario": 6000
+  },
+  {
+    "cargo": "Designer Gráfico",
+    "atividades": "Desenvolver e criar materiais gráficos, incluindo logotipos, identidades visuais, layouts, banners e peças publicitárias. Criar artes para mídias sociais e sites. Elaborar peças gráficas para campanhas publicitárias, eventos, feiras e outras demandas da empresa.",
+    "requisitos": "Experiência prévia em design gráfico. Conhecimento em softwares de edição gráfica como Photoshop, Illustrator e InDesign. Formação em Design Gráfico, Publicidade e Propaganda ou áreas afins. Habilidade em criatividade, atenção aos detalhes e capacidade de trabalhar sob pressão.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Designer de Interface",
+    "atividades": "Desenvolver e criar interfaces para sistemas e aplicativos. Criar layouts e protótipos de interfaces. Elaborar peças gráficas para campanhas publicitárias, eventos, feiras e outras demandas da empresa.",
+    "requisitos": "Experiência prévia em design de interface. Conhecimento em softwares de edição gráfica como Photoshop, Illustrator e InDesign. Formação em Design Gráfico, Publicidade e Propaganda ou áreas afins. Habilidade em criatividade, atenção aos detalhes e capacidade de trabalhar sob pressão.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Designer de Experiência do Usuário",
+    "atividades": "Desenvolver e criar interfaces para sistemas e aplicativos. Criar layouts e protótipos de interfaces. Elaborar peças gráficas para campanhas publicitárias, eventos, feiras e outras demandas da empresa.",
+    "requisitos": "Experiência prévia em design de interface. Conhecimento em softwares de edição gráfica como Photoshop, Illustrator e InDesign. Formação em Design Gráfico, Publicidade e Propaganda ou áreas afins. Habilidade em criatividade, atenção aos detalhes e capacidade de trabalhar sob pressão.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Analista Financeiro",
+    "atividades": "Realizar análises financeiras, elaborar relatórios e projeções financeiras. Auxiliar no planejamento orçamentário, controle de fluxo de caixa e contas a pagar e receber. Identificar oportunidades de melhorias na gestão financeira da empresa. Fazer interface com a área contábil e fiscal.",
+    "requisitos": "Experiência prévia em análise financeira. Conhecimento em Excel avançado e em ferramentas de gestão financeira. Formação em Administração, Economia, Ciências Contábeis ou áreas afins. Habilidade em resolução de problemas, pensamento analítico e comunicação.",
+    "salario": 5000
+  },
+  {
+    "cargo": "Assistente de Marketing",
+    "atividades": "Auxiliar nas atividades de marketing, incluindo criação de campanhas publicitárias, planejamento e execução de eventos e promoções, produção de conteúdo para mídias sociais e outros canais de comunicação. Acompanhar métricas e resultados das ações de marketing. ",
+    "requisitos": "Experiência prévia em atividades de marketing. Conhecimento em mídias sociais, produção de conteúdo e ferramentas de marketing digital. Formação em Marketing, Publicidade e Propaganda ou áreas afins. Habilidade em criatividade, trabalho em equipe e bom relacionamento interpessoal.",
+    "salario": 3000
+  },
+  {
+    "cargo": "Professor de Inglês",
+    "atividades": "Ministrar aulas de inglês para alunos de diferentes níveis, desde iniciantes até avançados. Preparar material didático e atividades que estimulem o aprendizado da língua. Avaliar o desempenho dos alunos e fornecer feedback. ",
+    "requisitos": "Experiência prévia em lecionar inglês. Formação em Letras, Inglês ou áreas afins. Habilidade em comunicação, didática e capacidade de trabalhar com alunos de diferentes níveis.",
+    "salario": 3500
+  },
+  {
+    "cargo": "Vendedor Externo",
+    "atividades": "Realizar vendas externas de produtos ou serviços, prospectando novos clientes e mantendo o relacionamento com os clientes existentes. Fazer apresentação dos produtos, negociação de preços e condições de pagamento. Elaborar relatórios de vendas e previsão de metas. ",
+    "requisitos": "Experiência prévia em vendas externas. Conhecimento em técnicas de vendas, atendimento ao cliente e negociação. Ensino médio completo. Habilidade em comunicação, persuasão e trabalho em equipe.",
+    "salario": 2500
+  },
+  {
+    "cargo": "Assistente Administrativo",
+    "atividades": "Realizar atividades administrativas, tais como atendimento telefônico, recepção e encaminhamento de correspondências, organização de arquivos, elaboração de relatórios, controle de documentos e materiais. Auxiliar nas rotinas financeiras e contábeis da empresa. ",
+    "requisitos": "Experiência prévia em atividades administrativas. Conhecimento em pacote Office, rotinas financeiras e contábeis. Ensino médio completo ou superior em Administração ou áreas afins. Habilidade em organização, comunicação e trabalho em equipe.",
+    "salario": 2000
+  },
+  {
+    "cargo": "Jornalista",
+    "atividades": "Realizar produção de conteúdo jornalístico para diferentes mídias, tais como jornais, revistas, sites e redes sociais. Realizar entrevistas, apuração de fatos e elaboração de reportagens. Participar da edição e revisão de textos. ",
+    "requisitos": "Experiência prévia em produção de conteúdo jornalístico. Formação em Jornalismo ou áreas afins. Conhecimento em técnicas de redação, apuração de fatos, edição de textos e produção multimídia. Habilidade em comunicação, organização e trabalho em equipe.",
+    "salario": 3500
+  },
+  {
+    "cargo": "Farmacêutico",
+    "atividades": "Realizar atendimento ao cliente em farmácias, orientando sobre o uso de medicamentos e produtos de saúde. Realizar controle de estoque e dispensação de medicamentos. Participar de processos de manipulação e produção de medicamentos. ",
+    "requisitos": "Experiência prévia em atendimento farmacêutico. Formação em Farmácia e registro no Conselho Regional de Farmácia. Conhecimento em legislação sanitária, gestão de estoque e dispensação de medicamentos. Habilidade em comunicação, atendimento ao cliente e trabalho em equipe.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Engenheiro Civil",
+    "atividades": "Realizar projetos de construção civil, desde a elaboração de projetos arquitetônicos até a execução da obra. Coordenar equipes de trabalho, planejar e controlar o uso de materiais e recursos. Realizar análise e interpretação de projetos, garantindo o cumprimento de normas técnicas e de segurança. ",
+    "requisitos": "Experiência prévia em projetos de construção civil. Formação em Engenharia Civil e registro no Conselho Regional de Engenharia e Agronomia. Conhecimento em técnicas de projeto, cálculo estrutural e normas técnicas. Habilidade em liderança, comunicação e trabalho em equipe.",
+    "salario": 9000
+  },
+  {
+    "cargo": "Psicólogo Clínico",
+    "atividades": "Realizar atendimento clínico a pacientes, por meio de avaliação psicológica, diagnóstico e tratamento de transtornos mentais. Realizar terapia individual, familiar e em grupo. Elaborar relatórios psicológicos e pareceres técnicos. ",
+    "requisitos": "Experiência prévia em atendimento clínico. Formação em Psicologia e registro no Conselho Regional de Psicologia. Conhecimento em técnicas de avaliação psicológica, terapia e elaboração de relatórios. Habilidade em comunicação, empatia e trabalho em equipe.",
+    "salario": 6000
+  },
+  {
+    "cargo": "Coordenador de Logística",
+    "atividades": "Coordenar atividades de transporte, armazenagem, distribuição e controle de estoque de produtos. Realizar planejamento estratégico de logística e elaboração de relatórios gerenciais. Acompanhar o desempenho da equipe, oferecendo suporte e orientação para melhoria dos resultados. ",
+    "requisitos": "Experiência prévia em gestão de logística. Ensino superior completo em Logística, Administração ou áreas afins. Conhecimento em técnicas de transporte, armazenagem, distribuição e controle de estoque. Habilidade em liderança, comunicação e trabalho em equipe.",
+    "salario": 8000
+  },
+  {
+    "cargo": "Gerente de Vendas",
+    "atividades": "Gerenciar equipe de vendas, estabelecendo metas e estratégias para atingimento de resultados. Realizar planejamento de vendas e elaboração de relatórios gerenciais. Acompanhar o desempenho da equipe, oferecendo suporte e orientação para melhoria dos resultados. ",
+    "requisitos": "Experiência prévia em gestão de vendas. Ensino superior completo em Administração, Marketing ou áreas afins. Conhecimento em técnicas de vendas, gestão de equipes e elaboração de planos de ação. Habilidade em liderança, comunicação e trabalho em equipe.",
+    "salario": 7000
+  },
+  {
+    "cargo": "Enfermeiro",
+    "atividades": "Realizar assistência a pacientes, por meio de avaliação, diagnóstico e tratamento de problemas de saúde. Realizar procedimentos técnicos e administrar medicamentos. Elaborar relatórios e pareceres técnicos. ",
+    "requisitos": "Experiência prévia em assistência à saúde. Formação em Enfermagem e registro no Conselho Regional de Enfermagem. Conhecimento em técnicas de assistência à saúde, administração de medicamentos e elaboração de relatórios. Habilidade em comunicação, empatia e trabalho em equipe.",
+    "salario": 5000
+  },
+  {
+    "cargo": "Coordenador de Comunicação",
+    "atividades": "Coordenar as atividades de comunicação da empresa, como marketing, publicidade, relações públicas e eventos. Realizar planejamento estratégico de comunicação e elaboração de relatórios gerenciais. Acompanhar o desempenho da equipe, oferecendo suporte e orientação para melhoria dos resultados. ",
+    "requisitos": "Experiência prévia em coordenação de comunicação. Ensino superior completo em Comunicação, Marketing ou áreas afins. Conhecimento em técnicas de marketing, publicidade, relações públicas e eventos. Habilidade em liderança, comunicação e trabalho em equipe.",
+    "salario": 7000
+  },
+  {
+    "cargo": "Assistente Jurídico",
+    "atividades": "Realizar atividades jurídicas, como elaboração de contratos, petições e recursos. Realizar pesquisa doutrinária e jurisprudencial, elaborar relatórios e pareceres jurídicos. Realizar atendimento a clientes e representar a empresa em audiências e processos judiciais. ",
+    "requisitos": "Experiência prévia em atividades jurídicas. Ensino superior completo em Direito e registro na OAB. Conhecimento em legislação, elaboração de contratos, petições e recursos. Habilidade em comunicação, argumentação e trabalho em equipe.",
+    "salario": 4000
+  },
+  {
+    "cargo": "Gerente Comercial",
+    "atividades": "Gerenciar equipe comercial, estabelecendo metas e estratégias para atingimento de resultados. Realizar planejamento de vendas e elaboração de relatórios gerenciais. Acompanhar o desempenho da equipe, oferecendo suporte e orientação para melhoria dos resultados. ",
+    "requisitos": "Experiência prévia em gestão comercial. Ensino superior completo em Administração, Marketing ou áreas afins. Conhecimento em técnicas de vendas, gestão de equipes e elaboração de planos de ação. Habilidade em liderança, comunicação e trabalho em equipe.",
+    "salario": 8000
+  }
+]

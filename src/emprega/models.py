@@ -1,9 +1,14 @@
+from datetime import timedelta
+
 from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.postgres.fields import ArrayField
 from django.db import models, transaction
+from django.utils import timezone
 
 from emprega.validators import validate_cpf, validate_cnpj
 from recomendacao.tasks import process_candidato, process_vaga
@@ -89,6 +94,11 @@ class RegimeContratualChoices(models.IntegerChoices):
     FREELANCER = 5, "Freelancer"
     VOLUNTARIO = 6, "Voluntário"
     OUTRO = 7, "Outro"
+
+
+class TokenTypeChoices(models.TextChoices):
+    EMAIL_CONFIRMATION = "email_confirmation", "Confirmação de Email"
+    PASSWORD_RESET = "password_reset", "Redefinição de Senha"
 
 
 class UserManager(BaseUserManager):
@@ -195,6 +205,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin, AbstractBaseModel):
     )
     curriculo = models.FileField(
         verbose_name="Currículo", upload_to="curriculos", null=True, blank=True
+
     )
 
     curriculo_processado = models.TextField(verbose_name="Currículo Processado", null=True, blank=True)
@@ -233,16 +244,16 @@ class Candidato(Usuario):
     objects = CandidatoManager()
 
     def save(self, *args, **kwargs):
-        process = kwargs.pop("process", True)
-        created = kwargs.get("created", False)
+        from emprega.tasks import send_email_confirmation
 
-        print('hrer')
+        process = kwargs.pop("process", True)
+        created = kwargs.pop("created", False)
+
+        super(Usuario, self).save(*args, **kwargs)
 
         if process and created:
             transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
-            print(f'processando? {process}')
-
-        super(Usuario, self).save(*args, **kwargs)
+            send_email_confirmation.delay('email/confirmar_email.html', self.id)
 
     class Meta:
         proxy = True
@@ -449,7 +460,6 @@ class Vaga(AbstractBaseModel):
 
         if process:
             transaction.on_commit(lambda: process_vaga.delay(pk=self.pk))
-        print(f'processando? {process}')
 
     def __str__(self):
         return self.cargo
@@ -497,6 +507,44 @@ class Empregador(Usuario):
         proxy = True
         verbose_name = "Empregador"
         verbose_name_plural = "Empregadores"
+
+    def save(self, *args, **kwargs):
+        from emprega.tasks import send_email_confirmation
+
+        created = kwargs.pop('created', False)
+
+        super(Usuario, self).save(*args, **kwargs)
+
+        if created:
+            send_email_confirmation.delay('email/confirmar_email.html', self.id)
+
+
+class Token(AbstractBaseModel):
+    token = models.CharField(max_length=40)
+    user = models.OneToOneField(
+        Usuario, related_name="auth_token", on_delete=models.CASCADE, null=True, blank=True
+    )
+    type = models.CharField(max_length=100, choices=TokenTypeChoices.choices)
+
+    def __str__(self):
+        return self.token
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = self._generate_key()
+        return super(Token, self).save(*args, **kwargs)
+
+    def _generate_key(self):
+        return default_token_generator.make_token(self.user)
+
+    def is_valid(self):
+        return self.created_at > (timezone.now() - timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT))
+
+    def check_token(self, token):
+        return default_token_generator.check_token(self.user, token)
 
 
 auditlog.register(Usuario)

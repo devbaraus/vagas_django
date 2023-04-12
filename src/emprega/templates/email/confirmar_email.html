@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Confirme seu endereço de e-mail</title>
+</head>
+<body>
+  <div style="max-width: 600px; margin: 0 auto;">
+    <h1>Confirme seu endereço de e-mail</h1>
+    <p>Olá,</p>
+    <p>Seu endereço de e-mail, {{ user_email }}, foi cadastrado em nosso sistema.</p>
+    <p>No entanto, antes de poder acessar todas as funcionalidades do nosso site, precisamos confirmar que este é realmente o seu endereço de e-mail. Para confirmar, por favor clique no botão abaixo:</p>
+    <p><a href="{{ confirm_url }}"><button style="background-color: #008CBA; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Confirmar endereço de e-mail</button></a></p>
+    <p>Se o botão acima não funcionar, você também pode copiar e colar o seguinte link no seu navegador:</p>
+    <p>{{ confirm_url }}</p>
+    <p>Obrigado por se cadastrar em nosso site!</p>
+    <p>Atenciosamente,</p>
+    <p>A equipe do nosso site</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+[
+  [
+    {
+      "curso": "Ensino Fundamental",
+      "instituicao": "Escola Municipal João da Silva",
+      "nivel": "FUNDAMENTAL",
+      "data_inicio": "2000-02-01",
+      "data_conclusao": "2006-12-31"
+    },
+    {
+      "curso": "Ensino Médio",
+      "instituicao": "Colégio Estadual Pedro Alves",
+      "nivel": "MEDIO",
+      "data_inicio": "2007-02-01",
+      "data_conclusao": "2009-12-31"
+    },
+    {
+      "curso": "Engenharia Civil",
+      "instituicao": "Universidade Federal do Rio de Janeiro",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2010-02-01",
+      "data_conclusao": "2014-12-31"
+    },
+    {
+      "curso": "MBA em Gestão de Projetos",
+      "instituicao": "Fundação Getúlio Vargas",
+      "nivel": "POS_GRADUACAO",
+      "data_inicio": "2015-03-01",
+      "data_conclusao": "2016-11-30"
+    },
+    {
+      "curso": "Mestrado em Engenharia Civil",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "MESTRADO",
+      "data_inicio": "2017-02-01",
+      "data_conclusao": "2018-12-31"
+    },
+    {
+      "curso": "Doutorado em Engenharia Civil",
+      "instituicao": "Universidade de Brasília",
+      "nivel": "DOUTORADO",
+      "data_inicio": "2019-02-01",
+      "data_conclusao": "2023-12-31"
+    },
+    {
+      "curso": "Pós-Doutorado em Engenharia Civil",
+      "instituicao": "Massachusetts Institute of Technology",
+      "nivel": "POS_DOUTORADO",
+      "data_inicio": "2024-02-01",
+      "data_conclusao": "2025-12-31"
+    }
+  ],
+  [
+    {
+      "curso": "Bacharelado em Direito",
+      "instituicao": "Universidade Federal de Minas Gerais",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2014-03-01",
+      "data_conclusao": "2018-06-30"
+    }
+  ],
+  [
+    {
+      "curso": "Técnico em Informática",
+      "instituicao": "Escola Técnica Estadual João da Silva",
+      "nivel": "MEDIO",
+      "data_inicio": "2010-02-01",
+      "data_conclusao": "2011-11-30"
+    },
+    {
+      "curso": "Bacharelado em Ciência da Computação",
+      "instituicao": "Universidade Estadual de Campinas",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2012-02-01",
+      "data_conclusao": "2016-07-31"
+    },
+    {
+      "curso": "Mestrado em Inteligência Artificial",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "MESTRADO",
+      "data_inicio": "2017-02-01",
+      "data_conclusao": "2019-06-30"
+    }
+  ],
+  [
+    {
+      "curso": "Licenciatura em Letras",
+      "instituicao": "Universidade Federal do Rio Grande do Sul",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2012-03-01",
+      "data_conclusao": "2016-07-31"
+    },
+    {
+      "curso": "Mestrado em Literatura Brasileira",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "MESTRADO",
+      "data_inicio": "2017-03-01",
+      "data_conclusao": "2019-02-28"
+    },
+    {
+      "curso": "Doutorado em Estudos Literários",
+      "instituicao": "Universidade Federal do Rio de Janeiro",
+      "nivel": "DOUTORADO",
+      "data_inicio": "2020-03-01",
+      "data_conclusao": "2024-12-31"
+    }
+  ],
+  [
+    {
+      "curso": "Ensino Médio",
+      "instituicao": "Escola Estadual Padre José de Anchieta",
+      "nivel": "MEDIO",
+      "data_inicio": "2009-02-01",
+      "data_conclusao": "2011-11-30"
+    },
+    {
+      "curso": "Engenharia Civil",
+      "instituicao": "Universidade de Brasília",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2012-02-01",
+      "data_conclusao": "2017-06-30"
+    },
+    {
+      "curso": "Pós-Graduação em Gestão de Projetos",
+      "instituicao": "Fundação Getúlio Vargas",
+      "nivel": "POS_GRADUACAO",
+      "data_inicio": "2018-08-01",
+      "data_conclusao": "2020-07-31"
+    }
+  ],
+  [
+    {
+      "curso": "Técnico em Mecânica",
+      "instituicao": "Escola Técnica Estadual de São Paulo",
+      "nivel": "MEDIO",
+      "data_inicio": "2010-03-01",
+      "data_conclusao": "2011-11-30"
+    },
+    {
+      "curso": "Engenharia Mecânica",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2012-03-01",
+      "data_conclusao": "2017-06-30"
+    },
+    {
+      "curso": "Doutorado em Engenharia Mecânica",
+      "instituicao": "Massachusetts Institute of Technology",
+      "nivel": "DOUTORADO",
+      "data_inicio": "2017-09-01",
+      "data_conclusao": "2022-08-31"
+    }
+  ],
+  [
+    {
+      "curso": "Ensino Médio",
+      "instituicao": "Colégio São Francisco",
+      "nivel": "MEDIO",
+      "data_inicio": "2012-02-01",
+      "data_conclusao": "2014-11-30"
+    },
+    {
+      "curso": "Administração",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "SUPERIOR",
+      "data_inicio": "2015-03-01",
+      "data_conclusao": "2018-06-30"
+    },
+    {
+      "curso": "MBA em Gestão Financeira",
+      "instituicao": "Fundação Getúlio Vargas",
+      "nivel": "POS_GRADUACAO",
+      "data_inicio": "2019-08-01",
+      "data_conclusao": "2020-07-31"
+    },
+    {
+      "curso": "Doutorado em Administração",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "DOUTORADO",
+      "data_inicio": "2021-08-01",
+      "data_conclusao": "2025-07-31"
+    }
+  ],
+  [
+    {
+      "curso": "Técnico em Informática",
+      "instituicao": "Instituto Federal de Educação, Ciência e Tecnologia de São Paulo",
+      "nivel": "MEDIO",
+      "data_inicio": "01/02/2010",
+      "data_conclusao": "30/12/2012"
+    },
+    {
+      "curso": "Ciência da Computação",
+      "instituicao": "Universidade de São Paulo",
+      "nivel": "SUPERIOR",
+      "data_inicio": "01/03/2013",
+      "data_conclusao": "30/06/2017"
+    },
+    {
+      "curso": "Mestrado em Inteligência Artificial",
+      "instituicao": "Universidade Estadual de Campinas",
+      "nivel": "MESTRADO",
+      "data_inicio": "01/08/2018",
+      "data_conclusao": "30/07/2020"
+    }
+  ]
+]

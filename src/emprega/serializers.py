@@ -1,7 +1,9 @@
 import os
 
 from auditlog.models import LogEntry
+from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from drf_recaptcha.fields import ReCaptchaV2Field
 from rest_framework import serializers
 
@@ -24,6 +26,7 @@ from emprega.models import (
     UsuarioNivelChoices,
     Beneficio,
 )
+from emprega.tasks import send_email_reset_password
 
 
 class AbstractReCaptchaSerializer(serializers.ModelSerializer):
@@ -125,7 +128,7 @@ class EmpregadorCreateSerializer(UsuarioSerializer):
 
             user = Empregador(**user_data)
             user.set_password(validated_data.get("password"))
-            user.save()
+            user.save(created=True)
 
             endereco_data = {
                 "cep": validated_data.get("cep"),
@@ -162,6 +165,11 @@ class EmpregadorCreateSerializer(UsuarioSerializer):
 
 class EmpregadorCreateInternalSerializer(EmpregadorCreateSerializer):
     recaptcha = None
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
 
 
 class EmpregadorListSerializer(UsuarioSerializer):
@@ -249,6 +257,9 @@ class CandidatoCreateSerializer(UsuarioSerializer):
             "modelo_trabalho": {"write_only": True},
             "regime_contratual": {"write_only": True},
             "jornada_trabalho": {"write_only": True},
+            'curriculo': {
+                'allow_empty_file': True
+            }
         }
 
     def create(self, validated_data):
@@ -269,7 +280,7 @@ class CandidatoCreateSerializer(UsuarioSerializer):
 
             user = Candidato(**user_data)
             user.set_password(validated_data.get("password"))
-            user.save()
+            user.save(created=True)
 
             objetivo_profissional_data = {
                 "cargo": validated_data.get("cargo"),
@@ -288,6 +299,11 @@ class CandidatoCreateSerializer(UsuarioSerializer):
 
 class CandidatoCreateInternalSerializer(CandidatoCreateSerializer):
     recaptcha = None
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
 
 
 class EmpresaSerializer(AbstractReCaptchaSerializer):
@@ -379,6 +395,8 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
         }
 
     def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
         with transaction.atomic():
             beneficios = validated_data.pop("beneficios", [])
             vaga = Vaga.objects.create(**validated_data)
@@ -399,7 +417,6 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
 class VagaCreateInternalSerializer(VagaCreateSerializer):
     recaptcha = None
 
-
 class AvaliacaoSerializer(AbstractReCaptchaSerializer):
     class Meta:
         model = Avaliacao
@@ -418,6 +435,11 @@ class ObjetivoProfissionalSerializer(AbstractReCaptchaSerializer):
 class ObjetivoProfissionalInternalSerializer(ObjetivoProfissionalSerializer):
     recaptcha = None
 
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
+
 
 class FormacaoAcademicaSerializer(AbstractReCaptchaSerializer):
     class Meta:
@@ -430,6 +452,11 @@ class FormacaoAcademicaSerializer(AbstractReCaptchaSerializer):
 
 class FormacaoAcademicaInternalSerializer(FormacaoAcademicaSerializer):
     recaptcha = None
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
 
 
 class ExperienciaProfissionalSerializer(AbstractReCaptchaSerializer):
@@ -444,6 +471,11 @@ class ExperienciaProfissionalSerializer(AbstractReCaptchaSerializer):
 class ExperienciaProfissionalInternalSerializer(ExperienciaProfissionalSerializer):
     recaptcha = None
 
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
+
 
 class IdiomaSerializer(AbstractReCaptchaSerializer):
     class Meta:
@@ -456,6 +488,11 @@ class IdiomaSerializer(AbstractReCaptchaSerializer):
 
 class IdiomaInternalSerializer(IdiomaSerializer):
     recaptcha = None
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
 
 
 class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
@@ -475,6 +512,11 @@ class CursoEspecializacaoSerializer(AbstractReCaptchaSerializer):
 
 class CursoEspecializacaoInternalSerializer(CursoEspecializacaoSerializer):
     recaptcha = None
+
+    def create(self, validated_data):
+        validated_data.pop("recaptcha", None)
+
+        return super().create(validated_data)
 
 
 class CandidaturaSerializer(serializers.ModelSerializer):
@@ -532,3 +574,28 @@ class EmpregadorPerfilSerializer(UsuarioSerializer):
     def get_endereco(self, obj):
         item = Endereco.objects.filter(empresa_endereco__usuario=obj).first()
         return EnderecoSerializer(item).data
+
+
+class TokenSerializer(AbstractReCaptchaSerializer):
+    token = serializers.CharField()
+
+
+class PasswordTokenSerializer(TokenSerializer):
+    password = serializers.CharField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('token', 'password', 'recaptcha')
+
+
+class CPFPasswordResetSerializer(AbstractReCaptchaSerializer):
+    cpf = serializers.CharField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('cpf', 'recaptcha')
+
+    def save(self, **kwargs):
+        cpf = self.validated_data['cpf']
+        user = get_object_or_404(get_user_model(), cpf=cpf)
+        send_email_reset_password.delay('email/resetar_senha.html', user.id)

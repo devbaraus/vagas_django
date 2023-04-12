@@ -98,6 +98,8 @@ services:
       - .env
     environment:
       - OMP_NUM_THREADS=1
+    ports:
+      - 6379:6379
     depends_on:
       - db
       - redis

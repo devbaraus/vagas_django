@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Redefinição de e-mail da sua conta</title>
+</head>
+<body>
+<div style="max-width: 600px; margin: 0 auto;">
+    <h1>Redefinição de e-mail da sua conta</h1>
+    <p>Olá,</p>
+    <p>Recebemos uma solicitação para redefinir o endereço de e-mail da sua conta em nosso site. Se você não fez essa
+        solicitação, ignore este e-mail.</p>
+    <p>Para redefinir seu endereço de e-mail, clique no botão abaixo:</p>
+    <p><a href="{{ reset_url }}">
+        <button style="background-color: #008CBA; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+            Redefinir endereço de e-mail
+        </button>
+    </a></p>
+    <p>Ou copie e cole o seguinte link em seu navegador:</p>
+    <p>{{ reset_url }}</p>
+    <p>Este link expirará em 24 horas, portanto, certifique-se de redefinir seu endereço de e-mail antes desse
+        prazo.</p>
+    <p>Se você tiver problemas para redefinir seu endereço de e-mail, por favor entre em contato conosco por meio do
+        email {{ user_email }} para obter ajuda.</p>
+    <p>Obrigado,</p>
+    <p>A equipe do nosso site</p>
+</div>
+</body>
+</html>

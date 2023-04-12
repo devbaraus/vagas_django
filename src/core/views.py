@@ -1,6 +1,5 @@
 from django.contrib.auth import login
 from knox.views import LoginView as KnoxLoginView
-from rest_framework.authentication import BasicAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.permissions import AllowAny
 

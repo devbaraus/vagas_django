@@ -1,0 +1,218 @@
+[
+  [
+    {
+      "cargo": "Analista de Marketing",
+      "empresa": "ABC Ltda.",
+      "salario": 5000,
+      "atividades": "Desenvolvimento de campanhas de marketing digital, análise de métricas de desempenho, criação de conteúdo para redes sociais",
+      "data_inicio": "2019-01-01",
+      "data_fim": "2021-03-31"
+    },
+    {
+      "cargo": "Desenvolvedor Full-Stack",
+      "empresa": "XYZ Inc.",
+      "salario": 8000,
+      "atividades": "Desenvolvimento de aplicações web, integração com APIs de terceiros, testes unitários e de integração",
+      "data_inicio": "2021-04-01",
+      "data_fim": null
+    },
+    {
+      "cargo": "Gerente de Projetos",
+      "empresa": "PQR S.A.",
+      "salario": 10000,
+      "atividades": "Coordenação de equipe de desenvolvimento, gestão de cronograma e orçamento, apresentação de relatórios e resultados para a diretoria",
+      "data_inicio": "2016-06-01",
+      "data_fim": "2018-12-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Analista de Dados",
+      "empresa": "Data Analytics Inc.",
+      "salario": 6000,
+      "atividades": "Análise e modelagem de dados, criação de dashboards e relatórios, desenvolvimento de algoritmos de machine learning",
+      "data_inicio": "2018-07-01",
+      "data_fim": "2020-12-31"
+    },
+    {
+      "cargo": "Desenvolvedor Mobile",
+      "empresa": "Mobile Apps Ltda.",
+      "salario": 7500,
+      "atividades": "Desenvolvimento de aplicativos móveis, integração com APIs de terceiros, testes e depuração",
+      "data_inicio": "2021-01-01",
+      "data_fim": null
+    },
+    {
+      "cargo": "Analista de Sistemas",
+      "empresa": "Systems Solutions SA",
+      "salario": 5500,
+      "atividades": "Análise e desenvolvimento de sistemas, documentação de requisitos, suporte a usuários",
+      "data_inicio": "2016-02-01",
+      "data_fim": "2018-06-30"
+    }
+  ],
+  [
+    {
+      "cargo": "Gerente de Marketing",
+      "empresa": "Marketing Strategies Ltda.",
+      "salario": 9000,
+      "atividades": "Coordenação da equipe de marketing, criação de estratégias de marketing, análise de resultados, gerenciamento de campanhas publicitárias",
+      "data_inicio": "2017-03-01",
+      "data_fim": "2020-02-29"
+    },
+    {
+      "cargo": "Analista de Sistemas",
+      "empresa": "Tech Solutions SA",
+      "salario": 7000,
+      "atividades": "Análise e desenvolvimento de sistemas, documentação de requisitos, testes e depuração",
+      "data_inicio": "2020-03-01",
+      "data_fim": null
+    },
+    {
+      "cargo": "Desenvolvedor Front-End",
+      "empresa": "Web Development Inc.",
+      "salario": 6000,
+      "atividades": "Desenvolvimento de interfaces web, criação de layouts responsivos, integração com APIs de terceiros",
+      "data_inicio": "2015-06-01",
+      "data_fim": "2016-12-31"
+    },
+    {
+      "cargo": "Analista Financeiro",
+      "empresa": "Financial Analytics Corp.",
+      "salario": 8000,
+      "atividades": "Análise de dados financeiros, elaboração de relatórios gerenciais, gestão de orçamentos e despesas",
+      "data_inicio": "2013-01-01",
+      "data_fim": "2015-05-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Gerente de Vendas",
+      "empresa": "Sales Inc.",
+      "salario": 12000,
+      "atividades": "Gerenciamento da equipe de vendas, prospecção de novos clientes, elaboração de estratégias de vendas, análise de mercado",
+      "data_inicio": "2019-01-01",
+      "data_fim": null
+    },
+    {
+      "cargo": "Professor de Inglês",
+      "empresa": "Language School Ltda.",
+      "salario": 5000,
+      "atividades": "Ministrar aulas de inglês, elaboração de materiais didáticos, correção de exercícios",
+      "data_inicio": "2016-03-01",
+      "data_fim": "2018-12-31"
+    },
+    {
+      "cargo": "Gerente de Operações",
+      "empresa": "Logistics Solutions SA",
+      "salario": 10000,
+      "atividades": "Gerenciamento das operações logísticas, gestão de estoques, planejamento de rotas, supervisão da equipe de operações",
+      "data_inicio": "2013-06-01",
+      "data_fim": "2015-12-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Consultor de Marketing",
+      "empresa": "Marketing Solutions Inc.",
+      "salario": 8000,
+      "atividades": "Análise de mercado, estratégias de marketing, planejamento de campanhas publicitárias, gerenciamento de redes sociais",
+      "data_inicio": "2017-02-01",
+      "data_fim": "2019-07-31"
+    },
+    {
+      "cargo": "Engenheiro de Produção",
+      "empresa": "Production Ltda.",
+      "salario": 9500,
+      "atividades": "Gestão da produção, planejamento de processos produtivos, melhoria contínua, análise de dados de produção",
+      "data_inicio": "2014-05-01",
+      "data_fim": "2017-01-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Advogado",
+      "empresa": "Law Firm Inc.",
+      "salario": 10000,
+      "atividades": "Elaboração de petições, análise de contratos, representação em audiências, consultoria jurídica",
+      "data_inicio": "2015-01-01",
+      "data_fim": "2017-12-31"
+    },
+    {
+      "cargo": "Analista Financeiro",
+      "empresa": "Finance Solutions Ltda.",
+      "salario": 7500,
+      "atividades": "Análise de investimentos, elaboração de relatórios financeiros, gerenciamento de orçamentos, projeção de fluxo de caixa",
+      "data_inicio": "2018-01-01",
+      "data_fim": "2019-12-31"
+    },
+    {
+      "cargo": "Arquiteto",
+      "empresa": "Architecture Studio Ltda.",
+      "salario": 9000,
+      "atividades": "Projeto de construções, elaboração de desenhos técnicos, orçamentação, gerenciamento de projetos",
+      "data_inicio": "2013-01-01",
+      "data_fim": "2014-12-31"
+    },
+    {
+      "cargo": "Psicólogo Clínico",
+      "empresa": "Psychotherapy Clinic Ltda.",
+      "salario": 8000,
+      "atividades": "Atendimento clínico, elaboração de diagnósticos, terapia individual e em grupo, acompanhamento de casos",
+      "data_inicio": "2010-01-01",
+      "data_fim": "2012-12-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Desenvolvedor Front-end",
+      "empresa": "Web Tech Solutions",
+      "salario": 9500,
+      "atividades": "Desenvolvimento de interfaces, implementação de layouts responsivos, manutenção de aplicações web, testes de usabilidade",
+      "data_inicio": "2018-02-01",
+      "data_fim": "2021-06-30"
+    },
+    {
+      "cargo": "Desenvolvedor Full-stack",
+      "empresa": "Software House S.A.",
+      "salario": 12000,
+      "atividades": "Desenvolvimento de aplicações web, criação de APIs, integração com serviços externos, gerenciamento de banco de dados",
+      "data_inicio": "2015-01-01",
+      "data_fim": "2018-01-31"
+    },
+    {
+      "cargo": "Arquiteto de Soluções",
+      "empresa": "Cloud Computing Inc.",
+      "salario": 15000,
+      "atividades": "Desenho de soluções para cloud computing, arquitetura de sistemas distribuídos, gerenciamento de escalabilidade, análise de segurança",
+      "data_inicio": "2012-01-01",
+      "data_fim": "2014-12-31"
+    }
+  ],
+  [
+    {
+      "cargo": "Enfermeiro Especialista em Emergência",
+      "empresa": "Hospital da Cidade",
+      "salario": 8000,
+      "atividades": "Atendimento a pacientes em estado crítico, administração de medicamentos, monitoramento de sinais vitais, preparo de pacientes para exames e cirurgias",
+      "data_inicio": "2018-06-01",
+      "data_fim": "2022-03-31"
+    },
+    {
+      "cargo": "Médico Cardiologista",
+      "empresa": "Clínica do Coração",
+      "salario": 18000,
+      "atividades": "Realização de consultas, diagnóstico e tratamento de doenças cardiovasculares, acompanhamento de pacientes em pós-operatório, prescrição de medicamentos",
+      "data_inicio": "2015-01-01",
+      "data_fim": "2018-05-31"
+    },
+    {
+      "cargo": "Psicóloga Clínica",
+      "empresa": "Consultório Particular",
+      "salario": 6000,
+      "atividades": "Realização de terapia individual e em grupo, avaliação psicológica, encaminhamento para tratamentos especializados, elaboração de relatórios e pareceres",
+      "data_inicio": "2012-01-01",
+      "data_fim": "2014-12-31"
+    }
+  ]
+]

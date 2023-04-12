@@ -20,6 +20,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# environ.Env.read_env(os.path.join(BASE_DIR, "../.env"))
 environ.Env.read_env(os.path.join(BASE_DIR, "../.env.local"))
 
 # Quick-start development settings - unsuitable for production
@@ -30,6 +31,11 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", False)
+# DEBUG = os.getenv("DJANGO_DEBUG", False)
+
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 5
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").replace("'", "").split(" ")
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").replace("'", "").split(" ")
@@ -219,3 +225,12 @@ CELERY_TIMEZONE = os.getenv("TIMEZONE", "America/Sao_Paulo")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_PORT = os.getenv("EMAIL_PORT", 587)
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", True)
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", False)
+

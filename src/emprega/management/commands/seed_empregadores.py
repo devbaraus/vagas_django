@@ -1,3 +1,4 @@
+import json
 import os
 import random
 
@@ -38,8 +39,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('number', type=int, help=_('The number of users to create'))
         parser.add_argument('--vagas', type=str, help=_('The number of jobs to create'))
+        parser.add_argument("--vagas_input", type=str, help=_("The path to the file with the jobs to create"))
 
-    def _gerar_vaga(self):
+    def _gerar_vaga(self, **kwargs):
         beneficios = Beneficio.objects.all().values('id')
         beneficios = [beneficio['id'] for beneficio in beneficios]
         beneficios = random.sample(list(beneficios), random.randint(1, len(beneficios)))
@@ -58,9 +60,12 @@ class Command(BaseCommand):
             "idade_maxima": fake.pyint(min_value=18, max_value=60),
             "beneficios": beneficios,
             "quantidade_vagas": fake.pyint(min_value=1, max_value=100),
+            **kwargs,
         }
 
     def _get_random_user(self):
+        fake_email = f'{fake.user_name()}@tuamaeaquelaursa.com'
+
         return {
             "nome": fake.name(),
             "data_nascimento": fake.date_of_birth(),
@@ -70,7 +75,7 @@ class Command(BaseCommand):
             "area_atuacao": fake.job(),
             "cargo": fake.job(),
 
-            "email": fake.email(),
+            "email": fake_email,
             "telefone": fake.phone_number().replace(' ', '').replace('-', '').replace('(', '').replace(')', ''),
             "password": FAKE_PASSWORD,
 
@@ -98,6 +103,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         number_users = options['number'] or 1
         number_jobs = options['vagas'] or '0'
+        i_vagas = options['vagas_input']
+        l_vagas = []
+
+        # Check if input is a json file
+        if i_vagas:
+            if not i_vagas.endswith('.json'):
+                raise ValueError('Input file must be a json file')
+            with open(i_vagas, 'r') as f:
+                vagas = json.load(f)
+                vagas_in = vagas
 
         if '~' in number_jobs:
             number_jobs = number_jobs.split('~')
@@ -114,7 +129,12 @@ class Command(BaseCommand):
                 empregador = empregador_serializer.save()
 
                 for j in range(number_jobs):
-                    vaga = self._gerar_vaga()
+                    r_vaga = {}
+
+                    if vagas_in:
+                        r_vaga = random.choice(vagas_in)
+
+                    vaga = self._gerar_vaga(**r_vaga)
                     vaga['empresa'] = empregador.empresa.id
                     vaga_serializer = VagaCreateInternalSerializer(data=vaga)
                     vaga_serializer.is_valid(raise_exception=True)

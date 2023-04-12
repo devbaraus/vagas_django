@@ -150,7 +150,6 @@ class VagaFactory(DjangoModelFactory):
     idade_minima = factory.Faker("random_int", min=18, max=65)
     idade_maxima = factory.Faker("random_int", min=18, max=65)
     quantidade_vagas = factory.Faker("random_int", min=1, max=10)
-    beneficios = factory.Faker("text")
     empresa = factory.SubFactory(EmpresaFactory)
 
 

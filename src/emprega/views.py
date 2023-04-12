@@ -1,10 +1,12 @@
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from emprega.models import (
     Empresa,
@@ -21,7 +23,7 @@ from emprega.models import (
     Usuario,
     UsuarioNivelChoices,
     Avaliacao,
-    Beneficio,
+    Beneficio, Token, TokenTypeChoices,
 )
 from emprega.permissions import (
     AdminPermission,
@@ -53,8 +55,9 @@ from emprega.serializers import (
     CandidatoPerfilSerializer,
     EmpregadorPerfilSerializer,
     BeneficioSerializer,
-    VagaCreateSerializer,
+    VagaCreateSerializer, CPFPasswordResetSerializer, PasswordTokenSerializer, TokenSerializer,
 )
+from emprega.tasks import send_email_confirmation
 from recomendacao.recommendation import recommend_vagas_tfidf, recommend_vagas_bert, recommend_candidatos_tfidf, \
     recommend_candidatos_bert
 
@@ -582,3 +585,74 @@ class EmpregadorViews(AbstractViewSet):
         empregador = self.get_object()
         serializer = EmpresaSerializer(empregador.empresa)
         return Response(serializer.data)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = (AllowAny,)
+    serializers = {
+        'post': CPFPasswordResetSerializer,
+        'put': PasswordTokenSerializer
+    }
+
+    @property
+    def serializer_class(self):
+        return self.serializers.get(self.request.method.lower(), TokenSerializer)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data.get('token')
+        password = serializer.validated_data.get('password')
+        token_obj = get_object_or_404(Token, token=token, type=TokenTypeChoices.PASSWORD_RESET)
+
+        user = token_obj.user
+
+        if not token_obj.is_valid():
+            return Response({'error': 'Token inválido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(password)
+        user.save()
+
+        return Response({'success': 'Senha alterada'}, status=status.HTTP_200_OK)
+
+
+class EmailVerificationView(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = TokenSerializer
+
+    @transaction.atomic
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.esta_verificado:
+            return Response({'error': 'Email já verificado'}, status=status.HTTP_400_BAD_REQUEST)
+
+        send_email_confirmation('email/confirmar_email.html', user.id)
+        return Response({'success': 'Email enviado'}, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        token_obj = get_object_or_404(Token, token=token, type=TokenTypeChoices.EMAIL_CONFIRMATION)
+
+        user = token_obj.user
+
+        if not token_obj.is_valid():
+            return Response({'error': 'Token inválido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.esta_verificado = True
+        user.save()
+
+        return Response({'success': 'Email verificado'}, status=status.HTTP_200_OK)

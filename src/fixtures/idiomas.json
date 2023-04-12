@@ -1,0 +1,146 @@
+[
+  [
+    {
+      "nome": "Espanhol",
+      "nivel": "AVANCADO"
+    },
+    {
+      "nome": "Francês",
+      "nivel": "FLUENTE"
+    },
+    {
+      "nome": "Italiano",
+      "nivel": "BASICO"
+    }
+  ],
+  [
+    {
+      "nome": "Alemão",
+      "nivel": "INTERMEDIARIO"
+    },
+    {
+      "nome": "Japonês",
+      "nivel": "AVANCADO"
+    }
+  ],
+  [
+    {
+      "nome": "Inglês",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Espanhol",
+      "nivel": "NATIVO"
+    }
+  ],
+  [
+    {
+      "nome": "Russo",
+      "nivel": "BASICO"
+    }
+  ],
+  [
+    {
+      "nome": "Mandarim",
+      "nivel": "NATIVO"
+    },
+    {
+      "nome": "Inglês",
+      "nivel": "INTERMEDIARIO"
+    }
+  ],
+  [
+    {
+      "nome": "Francês",
+      "nivel": "AVANCADO"
+    },
+    {
+      "nome": "Espanhol",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Italiano",
+      "nivel": "INTERMEDIARIO"
+    }
+  ],
+  [
+    {
+      "nome": "Alemão",
+      "nivel": "FLUENTE"
+    },
+    {
+      "nome": "Japonês",
+      "nivel": "AVANCADO"
+    },
+    {
+      "nome": "Inglês",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Coreano",
+      "nivel": "INTERMEDIARIO"
+    }
+  ],
+  [
+    {
+      "nome": "Alemão",
+      "nivel": "FLUENTE"
+    },
+    {
+      "nome": "Japonês",
+      "nivel": "AVANCADO"
+    },
+    {
+      "nome": "Inglês",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Coreano",
+      "nivel": "INTERMEDIARIO"
+    }
+  ],
+  [
+    {
+      "nome": "Espanhol",
+      "nivel": "NATIVO"
+    },
+    {
+      "nome": "Francês",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Italiano",
+      "nivel": "AVANCADO"
+    }
+  ],
+  [
+    {
+      "nome": "Inglês",
+      "nivel": "INTERMEDIARIO"
+    }
+  ],
+  [
+    {
+      "nome": "Espanhol",
+      "nivel": "AVANCADO"
+    },
+    {
+      "nome": "Japonês",
+      "nivel": "BASICO"
+    },
+    {
+      "nome": "Alemão",
+      "nivel": "FLUENTE"
+    }
+  ],
+  [
+    {
+      "nome": "Mandarim",
+      "nivel": "INTERMEDIARIO"
+    },
+    {
+      "nome": "Francês",
+      "nivel": "FLUENTE"
+    }
+  ]
+]

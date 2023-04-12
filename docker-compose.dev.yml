@@ -48,10 +48,11 @@ services:
     build: .
     image: devbaraus/emprega:latest
     restart: unless-stopped
-    command: sh -c "python manage.py runserver"
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     environment:
       - UID=1000
       - GID=1000
+      - DJANGO_DEBUG=True
     env_file:
       - .env
     ports:
@@ -76,6 +77,8 @@ services:
     build:
       context: .
     command: celery --app=core worker --loglevel=info -E
+    ports:
+      - 6379:6379
     volumes:
       - ./src:/app
     env_file:
