@@ -75,9 +75,9 @@ services:
       db:
         condition: service_healthy
     environment:
-      VIRTUAL_HOST: api.ceitec.bcc.ifg.edu.br
+      VIRTUAL_HOST: api.vagas.bcc.ifg.edu.br
       VIRTUAL_PORT: 8073
-      LETSENCRYPT_HOST: api.ceitec.bcc.ifg.edu.br
+      LETSENCRYPT_HOST: api.vagas.bcc.ifg.edu.br
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
       - nginx-proxy
@@ -105,9 +105,10 @@ services:
 
 volumes:
   emprega_base:
-    external: true
+
 
 networks:
-  nginx-proxy:
-    external: true
+  default:
+    external:
+      name: nginx-proxy
   
