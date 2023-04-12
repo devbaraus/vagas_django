@@ -186,22 +186,22 @@
       "curso": "Técnico em Informática",
       "instituicao": "Instituto Federal de Educação, Ciência e Tecnologia de São Paulo",
       "nivel": "MEDIO",
-      "data_inicio": "01/02/2010",
-      "data_conclusao": "30/12/2012"
+      "data_inicio": "2010-02-01",
+      "data_conclusao": "2012-12-30"
     },
     {
       "curso": "Ciência da Computação",
       "instituicao": "Universidade de São Paulo",
       "nivel": "SUPERIOR",
-      "data_inicio": "01/03/2013",
-      "data_conclusao": "30/06/2017"
+      "data_inicio": "2013-03-01",
+      "data_conclusao": "2017-06-30"
     },
     {
       "curso": "Mestrado em Inteligência Artificial",
       "instituicao": "Universidade Estadual de Campinas",
       "nivel": "MESTRADO",
-      "data_inicio": "01/08/2018",
-      "data_conclusao": "30/07/2020"
+      "data_inicio": "2018-08-01",
+      "data_conclusao": "2020-07-30"
     }
   ]
 ]
