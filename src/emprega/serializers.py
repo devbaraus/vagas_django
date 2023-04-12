@@ -348,7 +348,7 @@ class EmpresaCreateSerializer(AbstractReCaptchaSerializer):
         }
 
 
-class BeneficioSerializer(AbstractReCaptchaSerializer):
+class BeneficioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Beneficio
         fields = "__all__"
@@ -416,6 +416,7 @@ class VagaCreateSerializer(AbstractReCaptchaSerializer):
 
 class VagaCreateInternalSerializer(VagaCreateSerializer):
     recaptcha = None
+
 
 class AvaliacaoSerializer(AbstractReCaptchaSerializer):
     class Meta:

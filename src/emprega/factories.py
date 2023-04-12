@@ -24,7 +24,7 @@ from emprega.models import (
     ExperienciaProfissional,
     CursoEspecializacao,
     Avaliacao,
-    Beneficio,
+    Beneficio, JornadaTrabalhoChoices,
 )
 
 
@@ -56,13 +56,13 @@ class UserFactory(DjangoModelFactory):
     nome = factory.Faker("name")
     cpf = factory.lazy_attribute(lambda n: generate_cpf())
     data_nascimento = factory.Faker("date_of_birth", minimum_age=18, maximum_age=65)
-    sexo = factory.lazy_attribute(lambda _: random.choice(SexoChoices.choices)[0])
+    sexo = factory.lazy_attribute(lambda _: random.choice(SexoChoices.values))
     estado_civil = factory.lazy_attribute(
-        lambda _: random.choice(EstadoCivilChoices.choices)[0]
+        lambda _: random.choice(EstadoCivilChoices.values)
     )
 
     tipo_deficiencia = factory.lazy_attribute(
-        lambda _: random.choice(TipoDeficienciaChoices.choices)[0]
+        lambda _: random.choice(TipoDeficienciaChoices.values)
     )
 
     atuacao = factory.Faker("job")
@@ -87,12 +87,14 @@ class ObjetivoProfissionalFactory(DjangoModelFactory):
     cargo = factory.Faker("job")
     salario = fuzzy.FuzzyDecimal(1000, 10000, precision=2)
     modelo_trabalho = factory.lazy_attribute(
-        lambda _: random.choice(ModeloTrabalhoChoices.choices)[0]
+        lambda _: random.choice(ModeloTrabalhoChoices.values)
     )
     regime_contratual = factory.lazy_attribute(
-        lambda _: random.choice(RegimeContratualChoices.choices)[0]
+        lambda _: random.choice(RegimeContratualChoices.values)
     )
-    jornada_trabalho = factory.Faker("sentence", nb_words=5)
+    jornada_trabalho = factory.lazy_attribute(
+        lambda _: random.choice(JornadaTrabalhoChoices.values)
+    )
     usuario = factory.SubFactory(UserFactory)
 
 
@@ -139,14 +141,16 @@ class VagaFactory(DjangoModelFactory):
     requisitos = factory.Faker("text")
     pessoa_deficiencia = factory.Faker("boolean")
     salario = fuzzy.FuzzyDecimal(1000, 10000, precision=2)
-    jornada_trabalho = factory.Faker("sentence", nb_words=5)
+    jornada_trabalho = factory.lazy_attribute(
+        lambda _: random.choice(JornadaTrabalhoChoices.values)
+    )
     modelo_trabalho = factory.lazy_attribute(
-        lambda _: random.choice(ModeloTrabalhoChoices.choices)[0]
+        lambda _: random.choice(ModeloTrabalhoChoices.values)
     )
     regime_contratual = factory.lazy_attribute(
-        lambda _: random.choice(RegimeContratualChoices.choices)[0]
+        lambda _: random.choice(RegimeContratualChoices.values)
     )
-    sexo = factory.lazy_attribute(lambda _: random.choice(SexoChoices.choices)[0])
+    sexo = factory.lazy_attribute(lambda _: random.choice(SexoChoices.values))
     idade_minima = factory.Faker("random_int", min=18, max=65)
     idade_maxima = factory.Faker("random_int", min=18, max=65)
     quantidade_vagas = factory.Faker("random_int", min=1, max=10)
@@ -182,7 +186,7 @@ class IdiomaFactory(DjangoModelFactory):
 
     nome = factory.Faker("language_name")
     nivel = factory.lazy_attribute(
-        lambda _: random.choice(IdiomaNivelChoices.choices)[0]
+        lambda _: random.choice(IdiomaNivelChoices.values)
     )
     usuario = factory.SubFactory(UserFactory)
 
@@ -194,7 +198,7 @@ class FormacaoAcademicaFactory(DjangoModelFactory):
     instituicao = factory.Faker("company")
     curso = factory.Faker("job")
     nivel = factory.lazy_attribute(
-        lambda _: random.choice(FormacaoNivelChoices.choices)[0]
+        lambda _: random.choice(FormacaoNivelChoices.values)
     )
     data_inicio = factory.Faker("date")
     data_conclusao = factory.Faker("date")

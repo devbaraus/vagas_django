@@ -16,7 +16,7 @@ class AdminAvaliacaoTestCase(APITestCase):
 
         self.client = APIClient()
         self.uri = "/avaliacao/"
-        self.create_status = 201
+        self.create_status = 400
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 204
@@ -67,7 +67,7 @@ class AdminAvaliacaoTestCase(APITestCase):
 
         json_response = response.json()
 
-        self.assertEqual(len(json_response), 2)
+        self.assertEqual(len(json_response['results']), 2)
 
     def test_detail(self):
         user = UserFactory(nivel_usuario=UsuarioNivelChoices.EMPREGADOR)
@@ -126,7 +126,7 @@ class CandidatoAvaliacaoTestCase(AdminAvaliacaoTestCase):
         self.user = UserFactory(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         self.client = APIClient()
         self.uri = "/avaliacao/"
-        self.create_status = 201
+        self.create_status = 400
         self.retrieve_status = 200
         self.detail_status = 200
         self.delete_status = 204

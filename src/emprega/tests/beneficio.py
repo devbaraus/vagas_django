@@ -51,7 +51,7 @@ class AdminBeneficioTestCase(APITestCase):
 
         json_response = response.json()
 
-        self.assertEqual(len(json_response), 2)
+        self.assertEqual(len(json_response['results']), 2)
 
     def test_detail(self):
         beneficio = BeneficioFactory()

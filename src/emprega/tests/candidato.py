@@ -1,3 +1,6 @@
+import os
+from unittest import mock
+
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
@@ -24,11 +27,13 @@ class AdminCandidatoTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.user)
 
+    @mock.patch.dict(os.environ, {"RECAPTCHA_TESTING": "True"})
     def test_create(self):
         user = UserFactory.stub(nivel_usuario=UsuarioNivelChoices.CANDIDATO)
         objetivo_profisional = ObjetivoProfissionalFactory.stub(usuario=None)
 
         data = {
+            "g-recaptcha-response": "passed",
             "password": user.password,
             "nome": user.nome,
             "cpf": user.cpf,

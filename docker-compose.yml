@@ -24,7 +24,7 @@ services:
 
   migrate:
     container_name: emprega_migrate
-    build: .
+    image: devbaraus/emprega:latest
     command: python manage.py migrate --noinput
     env_file:
       - .env
@@ -40,16 +40,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./src:/app
 
   web:
     container_name: emprega_web
     build: .
+    image: devbaraus/emprega:latest
     restart: unless-stopped
     command: sh -c "python manage.py collectstatic --no-input && gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     env_file:
       - .env
-    ports:
-      - "8000:8000"
     volumes:
       - ./src/static:/app/static
     depends_on:
@@ -74,9 +75,9 @@ services:
       db:
         condition: service_healthy
     environment:
-      VIRTUAL_HOST: api.ceitec.baraus.dev
+      VIRTUAL_HOST: api.ceitec.bcc.ifg.edu.br
       VIRTUAL_PORT: 8073
-      LETSENCRYPT_HOST: api.ceitec.baraus.dev
+      LETSENCRYPT_HOST: api.ceitec.bcc.ifg.edu.br
       LETSENCRYPT_EMAIL: "me@baraus.dev"
     networks:
       - nginx-proxy
@@ -88,12 +89,9 @@ services:
     
   celery:
     container_name: emprega_celery
+    image: devbaraus/emprega:latest
     restart: always
-    build:
-      context: .
     command: celery --app=core worker --loglevel=info -E
-    volumes:
-      - ./src:/app
     env_file:
       - .env
     environment:
