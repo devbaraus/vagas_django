@@ -104,8 +104,6 @@ services:
       - web
 
 volumes:
-  emprega_nginx:
-    external: true
   emprega_base:
     external: true
 
