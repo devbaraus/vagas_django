@@ -41,7 +41,6 @@ ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").replace("'", "").split(" "
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").replace("'", "").split(" ")
 
 CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED", "").replace("'", "").split(" ")
-print(CORS_ALLOWED_ORIGINS)
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     "DELETE",
