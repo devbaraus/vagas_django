@@ -111,8 +111,7 @@ class Command(BaseCommand):
             if not i_vagas.endswith('.json'):
                 raise ValueError('Input file must be a json file')
             with open(i_vagas, 'r') as f:
-                vagas = json.load(f)
-                vagas_in = vagas
+                l_vagas = json.load(f)
 
         if '~' in number_jobs:
             number_jobs = number_jobs.split('~')
@@ -131,8 +130,8 @@ class Command(BaseCommand):
                 for j in range(number_jobs):
                     r_vaga = {}
 
-                    if vagas_in:
-                        r_vaga = random.choice(vagas_in)
+                    if l_vagas:
+                        r_vaga = random.choice(l_vagas)
 
                     vaga = self._gerar_vaga(**r_vaga)
                     vaga['empresa'] = empregador.empresa.id

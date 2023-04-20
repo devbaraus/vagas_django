@@ -195,19 +195,19 @@ class Command(BaseCommand):
                 candidato_serializer.is_valid(raise_exception=True)
                 candidato_serializer.save()
 
-                c_formacao = []
+                c_formacao = None
                 if l_formacao:
                     c_formacao = random.choice(l_formacao)
-                for val in (c_formacao or range(n_formacao)):
+                for val in (c_formacao or [{} for _ in range(n_formacao)]):
                     formacao = self._gerar_formacao_academica(candidato_serializer.data['id'], **val)
                     formacao_serializer = FormacaoAcademicaInternalSerializer(data=formacao)
                     formacao_serializer.is_valid(raise_exception=True)
                     formacao_serializer.save()
 
-                c_experiencia = []
+                c_experiencia = None
                 if l_experiencia:
                     c_experiencia = random.choice(l_experiencia)
-                for val in (c_experiencia or range(n_experiencia)):
+                for val in (c_experiencia or [{} for _ in range(n_experiencia)]):
                     experiencia = self._gerar_experiencia_profissional(candidato_serializer.data['id'], **val)
                     experiencia_serializer = ExperienciaProfissionalInternalSerializer(data=experiencia)
                     experiencia_serializer.is_valid(raise_exception=True)
@@ -216,7 +216,7 @@ class Command(BaseCommand):
                 c_curso = None
                 if l_curso:
                     c_curso = random.choice(l_curso)
-                for val in c_curso or range(n_curso):
+                for val in (c_curso or [{} for _ in range(n_curso)]):
                     curso = self._gerar_curso_especializacao(candidato_serializer.data['id'], **val)
                     curso_serializer = CursoEspecializacaoInternalSerializer(data=curso)
                     curso_serializer.is_valid(raise_exception=True)
@@ -226,7 +226,7 @@ class Command(BaseCommand):
                 if l_idioma:
                     c_idioma = random.choice(l_idioma)
 
-                for val in (c_idioma or range(n_idioma)):
+                for val in (c_idioma or [{} for _ in range(n_idioma)]):
                     idioma = self._gerar_idioma(candidato_serializer.data['id'], **val)
                     idioma_serializer = IdiomaInternalSerializer(data=idioma)
                     idioma_serializer.is_valid(raise_exception=True)
