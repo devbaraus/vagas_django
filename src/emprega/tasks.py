@@ -33,7 +33,7 @@ def send_email_reset_password(template: str, user_id: int):
     user = get_user_model().objects.get(id=user_id)
 
     token, _ = Token.objects.get_or_create(user=user, type=TokenTypeChoices.PASSWORD_RESET)
-    url = f"{settings.FRONTEND_URL}/redefinir-senha/?token={token.token}"
+    url = f"{settings.FRONTEND_URL}/recuperar-senha/?token={token.token}"
 
     html_message = render_to_string(template,
                                     {'reset_url': url, 'user_email': user.email})
