@@ -150,6 +150,7 @@ class CandidatoViews(AbstractViewSet):
         "list": CandidatoPerfilSerializer,
         "create": CandidatoCreateSerializer,
         "perfil": CandidatoPerfilSerializer,
+        "vaga": CandidatoPerfilSerializer,
     }
     queryset = Candidato.objects.all()
     permission_classes = [
@@ -158,6 +159,31 @@ class CandidatoViews(AbstractViewSet):
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers["default"])
+
+    @action(
+        detail=False, methods=["get"], url_path="vaga/(?P<vaga_id>[^/.]+)"
+    )
+    def vaga(self, request, vaga_id, *args, **kwargs):
+        recomendacao = request.query_params.get('recomendacao', 'false') == 'true'
+
+        vaga = get_object_or_404(Vaga, id=vaga_id)
+        queryset = Candidato.objects.filter(candidaturas_usuario__vaga=vaga)
+
+        if recomendacao and vaga:
+            if RECOMMENDATION_ALGORITHM == 'bert':
+                queryset = recommend_candidatos_bert(queryset, vaga)
+            if RECOMMENDATION_ALGORITHM == 'tfidf':
+                queryset = recommend_candidatos_tfidf(queryset, vaga)
+
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
 
     @action(detail=False, methods=["GET"])
     def perfil(self, request, *args, **kwargs):
