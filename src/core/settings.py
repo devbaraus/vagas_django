@@ -30,7 +30,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, "../.env.local"))
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", False)
+DEBUG = bool(os.getenv("DJANGO_DEBUG", "False") == "True")
 # DEBUG = os.getenv("DJANGO_DEBUG", False)
 
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 5
