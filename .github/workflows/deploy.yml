@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - main
-      - master
 jobs:
   build:
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     name: Build
     runs-on: ubuntu-latest
     steps:
