@@ -251,9 +251,10 @@ class Candidato(Usuario):
 
         super(Usuario, self).save(*args, **kwargs)
 
-        if created:
-            transaction.on_commit(lambda: send_email_confirmation.delay('email/confirmar_email.html', self.id))
-        if process:
+        if process and created:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
+            send_email_confirmation.delay('email/confirmar_email.html', self.id)
+        else if process:
             transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
 
     class Meta:
