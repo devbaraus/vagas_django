@@ -4,17 +4,20 @@ from recomendacao.recommendation import process_candidato_tfidf, process_candida
 
 @shared_task(name='process_candidato')
 def process_candidato(pk):
-    Usuario = apps.get_model('emprega.Usuario')
+    Candidato = apps.get_model('emprega.Candidato')
 
-    candidato = Usuario.objects.get(pk=pk)
+    candidato = Candidato.objects.get(pk=pk)
 
     processed_text = process_candidato_tfidf(candidato.curriculo)
     candidato.curriculo_processado = processed_text
 
+    #save the processed_text to use in case the embedding doesn't get processed in time
+    candidato.save(process = False)
+
     embedding = process_candidato_bert(candidato.curriculo)
     candidato.curriculo_embedding = embedding
 
-    print(f'usuario {candidato} - {candidato.pk} processado')
+    print(f'Candidato {candidato} - {candidato.pk} processado')
 
     candidato.save(process = False)
 
@@ -33,6 +36,6 @@ def process_vaga(pk):
     embedding = process_vaga_bert(vaga_text)
     vaga.vaga_embedding = embedding
 
-    print(f'vaga {vaga} - {vaga.pk} processada')
+    print(f'Vaga {vaga} - {vaga.pk} processada')
 
     vaga.save(process = False)

@@ -129,6 +129,10 @@ def process_vaga_bert(text):
 def recommend_vagas_bert(vagas, user):
     start = time.time()
 
+    #If bert embedding isn't created in time, use tfidf instead
+    if user.curriculo_embedding is None:
+        return recommend_vagas_tfidf(vagas, user)
+
     user_embedding = [user.curriculo_embedding]
     vagas_embedding = [vaga.vaga_embedding for vaga in vagas]
 
