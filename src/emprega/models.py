@@ -255,6 +255,8 @@ class Candidato(Usuario):
             transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
         if created:
             send_email_confirmation.delay('email/confirmar_email.html', self.id)
+        elif process:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
 
     class Meta:
         proxy = True
