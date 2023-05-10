@@ -253,6 +253,7 @@ class Candidato(Usuario):
 
         if process and created:
             transaction.on_commit(lambda: process_candidato.delay(pk=self.pk))
+        if created:
             send_email_confirmation.delay('email/confirmar_email.html', self.id)
 
     class Meta:
