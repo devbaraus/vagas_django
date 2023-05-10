@@ -53,6 +53,7 @@ services:
       - .env
     volumes:
       - ./src/static:/app/static
+      - ./src/media:/app/media
     depends_on:
       db:
         condition: service_healthy
