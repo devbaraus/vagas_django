@@ -53,6 +53,7 @@ services:
       - .env
     volumes:
       - ./src/static:/app/static
+      - ./src/media:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -69,6 +70,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./src/static:/static
+      - ./src/media:/media
       - ./nginx_log:/var/log/nginx
     depends_on:
       web:
