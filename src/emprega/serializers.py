@@ -24,7 +24,7 @@ from emprega.models import (
     RegimeContratualChoices,
     Avaliacao,
     UsuarioNivelChoices,
-    Beneficio,
+    Beneficio, Token,
 )
 from emprega.tasks import send_email_reset_password
 
@@ -579,6 +579,10 @@ class EmpregadorPerfilSerializer(UsuarioSerializer):
 
 class TokenSerializer(AbstractReCaptchaSerializer):
     token = serializers.CharField()
+
+    class Meta:
+        model = Token
+        fields = ('token', 'recaptcha')
 
 
 class PasswordTokenSerializer(TokenSerializer):
