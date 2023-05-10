@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Q
+from django.http import FileResponse
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -184,6 +185,11 @@ class CandidatoViews(AbstractViewSet):
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    @action(detail=True, methods=["GET"])
+    def curriculo(self, *args, **kwargs):
+        candidato = self.get_object()
+        return FileResponse(candidato.curriculo)
 
     @action(detail=False, methods=["GET"])
     def perfil(self, request, *args, **kwargs):
