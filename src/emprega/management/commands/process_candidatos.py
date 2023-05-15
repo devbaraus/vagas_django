@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         delay = options['delay']
         candidatos = Candidato.objects.all()
-    
+
         for candidato in candidatos:
             process_candidato.delay(pk = candidato.pk)
             sleep(delay)
