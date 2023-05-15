@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         delay = options['delay']
         vagas = Vaga.objects.all()
-    
+
         for vaga in vagas:
             process_vaga.delay(pk = vaga.pk)
             sleep(delay)
