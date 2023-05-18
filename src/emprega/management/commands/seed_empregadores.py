@@ -50,6 +50,7 @@ class Command(BaseCommand):
             "cargo": fake.job(),
             "atividades": fake.text(),
             "requisitos": fake.text(),
+            "esta_ativo": fake.boolean(),
             "pessoa_deficiente": random.choice([True, False]),
             "salario": fake.pyfloat(left_digits=4, right_digits=2, positive=True),
             "jornada_trabalho": random.choice(JornadaTrabalhoChoices.values),

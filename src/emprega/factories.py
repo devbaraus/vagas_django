@@ -140,7 +140,7 @@ class VagaFactory(DjangoModelFactory):
     atividades = factory.Faker("text")
     requisitos = factory.Faker("text")
     pessoa_deficiencia = factory.Faker("boolean")
-    is_ativo = factory.Faker("boolean")
+    esta_ativo = factory.Faker("boolean")
     salario = fuzzy.FuzzyDecimal(1000, 10000, precision=2)
     jornada_trabalho = factory.lazy_attribute(
         lambda _: random.choice(JornadaTrabalhoChoices.values)

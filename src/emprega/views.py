@@ -168,7 +168,7 @@ class CandidatoViews(AbstractViewSet):
         recomendacao = request.query_params.get('recomendacao', 'false') == 'true'
 
         vaga = get_object_or_404(Vaga, id=vaga_id)
-        queryset = Candidato.objects.filter(candidaturas_usuario__vaga=vaga)
+        queryset = Candidato.objects.filter(candidaturas_usuario__vaga=vaga, esta_ativo=True)
 
         if recomendacao and vaga:
             if RECOMMENDATION_ALGORITHM == 'bert':
