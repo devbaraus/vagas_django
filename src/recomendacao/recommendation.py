@@ -11,8 +11,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from unidecode import unidecode
 
 
-def process_candidato_tfidf(curriculo):
-    text = get_pdf_text(str(curriculo))
+def process_candidato_tfidf(curriculo, candidato_text):
+    try:
+        text = get_pdf_text(str(curriculo))
+    except:
+        text = ""
+
+    text += " " + candidato_text
 
     text = treat_text(text)
     return text
@@ -69,6 +74,7 @@ def get_pdf_text(pdf_path):
         text.append(page.extract_text())
 
     text = " ".join(text)
+    text = text.replace('\n', ' ')
 
     return text
 
@@ -109,9 +115,15 @@ def load_bert_model(model_name="paraphrase-multilingual-MiniLM-L12-v2"):
     return model
 
 
-def process_candidato_bert(curriculo):
+def process_candidato_bert(curriculo, candidato_text):
     model = load_bert_model()
-    text = get_pdf_text(str(curriculo))
+
+    try:
+        text = get_pdf_text(str(curriculo))
+    except:
+        text = ""
+
+    text += " " + candidato_text
 
     embedding = model.encode(text, show_progress_bar=False).tolist()
 

@@ -62,7 +62,7 @@ from emprega.tasks import send_email_confirmation
 from recomendacao.recommendation import recommend_vagas_tfidf, recommend_vagas_bert, recommend_candidatos_tfidf, \
     recommend_candidatos_bert
 
-RECOMMENDATION_ALGORITHM = 'tfidf'
+RECOMMENDATION_ALGORITHM = 'bert'
 
 
 class AbstractViewSet(
