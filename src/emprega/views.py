@@ -168,7 +168,7 @@ class CandidatoViews(AbstractViewSet):
         recomendacao = request.query_params.get('recomendacao', 'false') == 'true'
 
         vaga = get_object_or_404(Vaga, id=vaga_id)
-        queryset = Candidato.objects.filter(candidaturas_usuario__vaga=vaga)
+        queryset = Candidato.objects.filter(candidaturas_usuario__vaga=vaga, esta_ativo=True)
 
         if recomendacao and vaga:
             if RECOMMENDATION_ALGORITHM == 'bert':
@@ -580,6 +580,13 @@ class VagaViews(AbstractViewSet):
         serializer = CandidatoSerializer(vaga.candidatos.all(), many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["PUT"], url_path="(?P<vaga_id>[^/.]+)/arquivar")
+    def arquivar(self, request, vaga_id):
+        vaga = get_object_or_404(Vaga, pk=vaga_id)
+        vaga.esta_ativo = not vaga.esta_ativo
+        vaga.save()
+        serializer = VagaSerializer(vaga)
+        return Response(serializer.data)
 
 class AvaliacaoViews(AbstractViewSet):
     serializer_class = AvaliacaoSerializer

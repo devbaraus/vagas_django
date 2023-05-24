@@ -33,6 +33,7 @@ class AdminVagaTestCase(APITestCase):
         data = {
             "cargo": vaga.cargo,
             "atividades": vaga.atividades,
+            "esta_ativo": vaga.esta_ativo,
             "requisitos": vaga.requisitos,
             "pessoa_deficiencia": vaga.pessoa_deficiencia,
             "salario": vaga.salario,
@@ -60,6 +61,7 @@ class AdminVagaTestCase(APITestCase):
 
         self.assertEqual(json_response["cargo"], data["cargo"])
         self.assertEqual(json_response["atividades"], data["atividades"])
+        self.assertEqual(json_response["esta_ativo"], data["esta_ativo"])
         self.assertEqual(json_response["requisitos"], data["requisitos"])
         self.assertEqual(
             json_response["pessoa_deficiencia"], data["pessoa_deficiencia"]
@@ -113,6 +115,7 @@ class AdminVagaTestCase(APITestCase):
 
         self.assertEqual(json_response["cargo"], vaga.cargo)
         self.assertEqual(json_response["atividades"], vaga.atividades)
+        self.assertEqual(json_response["esta_ativo"], vaga.esta_ativo)
         self.assertEqual(json_response["requisitos"], vaga.requisitos)
         self.assertEqual(json_response["pessoa_deficiencia"], vaga.pessoa_deficiencia)
         self.assertEqual(json_response["salario"], str(vaga.salario))
@@ -137,6 +140,7 @@ class AdminVagaTestCase(APITestCase):
             "cargo": vaga.cargo,
             "atividades": vaga.atividades,
             "requisitos": vaga.requisitos,
+            "esta_ativo": vaga.esta_ativo,
             "pessoa_deficiencia": vaga.pessoa_deficiencia,
             "salario": vaga.salario,
             "jornada_trabalho": vaga.jornada_trabalho,
@@ -160,6 +164,7 @@ class AdminVagaTestCase(APITestCase):
 
         self.assertEqual(json_response["cargo"], data["cargo"])
         self.assertEqual(json_response["atividades"], data["atividades"])
+        self.assertEqual(json_response["esta_ativo"], data["esta_ativo"])
         self.assertEqual(json_response["requisitos"], data["requisitos"])
         self.assertEqual(
             json_response["pessoa_deficiencia"], data["pessoa_deficiencia"]
