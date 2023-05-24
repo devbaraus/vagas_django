@@ -371,6 +371,12 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "esta_ativo",
+                    models.BooleanField(
+                        default=True, verbose_name="Está ativo?"
+                    ),
+                ),
+                (
                     "salario",
                     models.DecimalField(
                         decimal_places=2, max_digits=10, verbose_name="Salário"
