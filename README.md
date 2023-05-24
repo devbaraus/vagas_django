@@ -30,7 +30,7 @@ Rode o seguinte comando no sh ou /bin/bash:
 ```bash
   python manage.py createsuperuser
 ```
->* Obs: Cadastre o superuser conforme indicado, lembrando de ter data de nascimento maior que 14 anos e no formato YYYY-MM-DD, senha com mais de 8 caracteres, sendo numéricos, letra maiúscula, minúscula e caractere especial.
+  >* Obs: Cadastre o superuser conforme indicado, lembrando de ter data de nascimento maior que 14 anos e no formato YYYY-MM-DD, senha com mais de 8 caracteres, sendo numéricos, letra maiúscula, minúscula e caractere especial.
 
 Reset do banco de dados
 ```bash
