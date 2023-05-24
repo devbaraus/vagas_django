@@ -580,6 +580,13 @@ class VagaViews(AbstractViewSet):
         serializer = CandidatoSerializer(vaga.candidatos.all(), many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=["PUT"], url_path="(?P<vaga_id>[^/.]+)/arquivar")
+    def arquivar(self, request, vaga_id):
+        vaga = get_object_or_404(Vaga, pk=vaga_id)
+        vaga.esta_ativo = not vaga.esta_ativo
+        vaga.save()
+        serializer = VagaSerializer(vaga)
+        return Response(serializer.data)
 
 class AvaliacaoViews(AbstractViewSet):
     serializer_class = AvaliacaoSerializer
