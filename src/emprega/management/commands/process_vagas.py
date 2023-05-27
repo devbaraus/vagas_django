@@ -13,6 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         delay = options['delay']
+        if not delay:
+            delay = 1
+
         vagas = Vaga.objects.all()
 
         for vaga in vagas:

@@ -13,6 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         delay = options['delay']
+        if not delay:
+            delay = 1
+
         candidatos = Candidato.objects.all()
 
         for candidato in candidatos:

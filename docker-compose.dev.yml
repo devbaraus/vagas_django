@@ -78,7 +78,7 @@ services:
     restart: always
     build:
       context: .
-    command: celery --app=core worker --loglevel=info -E
+    command: celery --app=core worker --loglevel=info --concurrency 3 -E
     ports:
       - 6379:6379
     volumes:

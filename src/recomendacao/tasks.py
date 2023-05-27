@@ -5,16 +5,35 @@ from recomendacao.recommendation import process_candidato_tfidf, process_candida
 @shared_task(name='process_candidato')
 def process_candidato(pk):
     Candidato = apps.get_model('emprega.Candidato')
+    FormacaoAcademica = apps.get_model('emprega.FormacaoAcademica')
+    ExperienciaProfissional = apps.get_model('emprega.ExperienciaProfissional')
+    CursoEspecializacao = apps.get_model('emprega.CursoEspecializacao')
+    Idioma = apps.get_model('emprega.Idioma')
 
     candidato = Candidato.objects.get(pk=pk)
 
-    processed_text = process_candidato_tfidf(candidato.curriculo)
+    educations = FormacaoAcademica.objects.filter(usuario=candidato)
+    educations =  " ".join([str(education) for education in educations])
+
+    experiences = ExperienciaProfissional.objects.filter(usuario=candidato)
+    experiences = " ".join([f'{str(experience)} {experience.atividades}' for experience in experiences])
+
+    courses = CursoEspecializacao.objects.filter(usuario=candidato)
+    courses = " ".join([str(course) for course in courses])
+
+    languages = Idioma.objects.filter(usuario=candidato)
+    languages = " ".join([str(language) for language in languages])
+
+    candidato_text = " ".join([educations, experiences, courses, languages])
+
+    processed_text = process_candidato_tfidf(candidato.curriculo, candidato_text)
+
     candidato.curriculo_processado = processed_text
 
     #save the processed_text to use in case the embedding doesn't get processed in time
     candidato.save(process = False)
 
-    embedding = process_candidato_bert(candidato.curriculo)
+    embedding = process_candidato_bert(candidato.curriculo, candidato_text)
     candidato.curriculo_embedding = embedding
 
     print(f'Candidato {candidato} - {candidato.pk} processado')
