@@ -47,11 +47,13 @@ def process_vaga(pk):
 
     vaga = Vaga.objects.get(pk = pk)
     empresa = vaga.empresa
-    vaga_text = " ".join([vaga.cargo, vaga.atividades, vaga.esta_ativo, vaga.requisitos, empresa.ramo_atividade, empresa.descricao])
+    vaga_text = " ".join([vaga.cargo, vaga.atividades, vaga.requisitos, empresa.ramo_atividade, empresa.descricao])
 
     processed_text = process_vaga_tfidf(vaga_text)
     vaga.vaga_processada = processed_text
 
+    vaga.save(process = False)
+    
     embedding = process_vaga_bert(vaga_text)
     vaga.vaga_embedding = embedding
 

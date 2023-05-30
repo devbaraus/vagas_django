@@ -86,11 +86,9 @@ services:
     networks:
       - nginx-proxy
       - default
-
   redis:
     container_name: emprega_redis
     image: redis:alpine
-
   celery:
     container_name: emprega_celery
     image: devbaraus/emprega:latest
@@ -102,6 +100,8 @@ services:
       - OMP_NUM_THREADS=1
     ports:
       - 6379:6379
+    volumes:
+      - ./src/media:/app/media
     depends_on:
       - db
       - redis
