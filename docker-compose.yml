@@ -101,6 +101,7 @@ services:
     ports:
       - 6379:6379
     volumes:
+      - ./src/recomendacao:/app/recomendacao
       - ./src/media:/app/media
     depends_on:
       - db
