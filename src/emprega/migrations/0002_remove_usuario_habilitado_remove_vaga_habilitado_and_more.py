@@ -33,9 +33,9 @@ class Migration(migrations.Migration):
             name="esta_verificado",
             field=models.BooleanField(default=False, verbose_name="esta_verificado"),
         ),
-        migrations.AddField(
-            model_name="vaga",
-            name="esta_ativo",
-            field=models.BooleanField(default=True, verbose_name="Está ativo"),
-        ),
+        # migrations.AddField(
+        #     model_name="vaga",
+        #     name="esta_ativo",
+        #     field=models.BooleanField(default=True, verbose_name="Está ativo"),
+        # ),
     ]
