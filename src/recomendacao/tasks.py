@@ -24,7 +24,7 @@ def process_candidato(pk):
     languages = Idioma.objects.filter(usuario=candidato)
     languages = " ".join([str(language) for language in languages])
 
-    candidato_text = " ".join([educations, experiences, courses, languages])
+    candidato_text = " ".join([str(candidato.cargo), str(candidato.atuacao), educations, experiences, courses, languages])
 
     processed_text = process_candidato_tfidf(candidato.curriculo, candidato_text)
 
