@@ -12,9 +12,13 @@ from unidecode import unidecode
 
 
 def process_candidato_tfidf(curriculo, candidato_text):
-    try:
-        text = get_pdf_text(str(curriculo))
-    except:
+    if curriculo:
+        try:
+            text = get_pdf_text(str(curriculo))
+        except Exception as e:
+            print(e)
+            text = ""
+    else:
         text = ""
 
     text += " " + candidato_text
@@ -118,9 +122,13 @@ def load_bert_model(model_name="paraphrase-multilingual-MiniLM-L12-v2"):
 def process_candidato_bert(curriculo, candidato_text):
     model = load_bert_model()
 
-    try:
-        text = get_pdf_text(str(curriculo))
-    except:
+    if curriculo:
+        try:
+            text = get_pdf_text(str(curriculo))
+        except Exception as e:
+            print(e)
+            text = ""
+    else:
         text = ""
 
     text += " " + candidato_text
@@ -161,6 +169,9 @@ def recommend_vagas_bert(vagas, user):
 def recommend_candidatos_bert(candidatos, vaga):
     start = time.time()
 
+    if vaga.vaga_embedding is None:
+        return recommend_candidatos_tfidf(candidatos, vaga)
+
     vaga_embedding = [vaga.vaga_embedding]
     candidatos_embedding = [candidato.curriculo_embedding for candidato in candidatos]
 
@@ -182,7 +193,7 @@ if __name__ == '__main__':
 
     usuarios = Usuario.objects.filter(nivel_usuario=4)
     vagas = Vaga.objects.all()
-    usuario = Usuario.objects.get(cpf="13673179675")
+    usuario = Usuario.objects.get(pk=1)
     vaga = Vaga.objects.get(pk=1)
 
     vagas_rec = recommend_vagas_bert(vagas, usuario)

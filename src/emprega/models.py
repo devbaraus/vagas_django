@@ -297,6 +297,14 @@ class Idioma(AbstractBaseModel):
         Usuario, on_delete=models.CASCADE, related_name="idiomas_usuario"
     )
 
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+
+        super(Idioma, self).save(*args, **kwargs)
+
+        if process:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.usuario.pk))
+
     def __str__(self):
         return self.nome
 
@@ -313,6 +321,14 @@ class FormacaoAcademica(AbstractBaseModel):
     usuario = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name="formacoes_academicas_usuario"
     )
+
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+
+        super(FormacaoAcademica, self).save(*args, **kwargs)
+
+        if process:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.usuario.pk))
 
     def __str__(self):
         return self.instituicao + " - " + self.curso
@@ -334,6 +350,14 @@ class ExperienciaProfissional(AbstractBaseModel):
         related_name="experiencias_profissionais_usuario",
     )
 
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+
+        super(ExperienciaProfissional, self).save(*args, **kwargs)
+
+        if process:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.usuario.pk))
+
     def __str__(self):
         return self.empresa + " - " + self.cargo
 
@@ -350,6 +374,14 @@ class CursoEspecializacao(AbstractBaseModel):
     usuario = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name="cursos_especializacao_usuario"
     )
+
+    def save(self, *args, **kwargs):
+        process = kwargs.pop("process", True)
+
+        super(CursoEspecializacao, self).save(*args, **kwargs)
+
+        if process:
+            transaction.on_commit(lambda: process_candidato.delay(pk=self.usuario.pk))
 
     def __str__(self):
         return self.instituicao + " - " + self.curso
