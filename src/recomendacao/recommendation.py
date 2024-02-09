@@ -105,7 +105,8 @@ def apply_tfidf(query, corpus):
     return query_tfidf, corpus_tfidf
 
 
-def load_bert_model(model_name="paraphrase-multilingual-MiniLM-L12-v2"):
+def load_bert_model(model_name="neuralmind/bert-base-portuguese-cased"):
+    #old model "paraphrase-multilingual-MiniLM-L12-v2"
     model_path = os.path.join(os.path.dirname(__file__), f'bert_models/{model_name}')
 
     try:
